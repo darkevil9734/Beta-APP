@@ -18,19 +18,14 @@ public class BillDB extends SQLiteOpenHelper{
     }
 
     private static final String BILL_ID = "id";
-    private static final String BILL_NAME = "name";
-    private static final String BILL_AMOUNT = "amount";
-    private static final String BILL_PRICE = "price";
-    private SQLiteDatabase db;
+    private static final String BILL_NAME = "soLuongMua";
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         String createTable = "CREATE TABLE "+ TABLE_NAME +
                 "(" +
                 BILL_ID + " INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT, " +
-                BILL_NAME + " TEXT  NOT NULL, " +
-                BILL_AMOUNT + " INTEGER NOT NULL," +
-                BILL_PRICE + "INTEGER NOT NULL" +
+                BILL_NAME + " TEXT  NOT NULL" +
                 ")";
 
         db.execSQL(createTable);
@@ -41,17 +36,15 @@ public class BillDB extends SQLiteOpenHelper{
 
     }
 
-    public void insertData(String name, int amount, int price){
+    public void insertData(int id, int soluong){
         SQLiteDatabase database = getWritableDatabase();
-        String sql = "INSERT INTO " + TABLE_NAME  +  " VALUES (NULL, ?, ?, ?)";
+        String sql = "INSERT INTO " + TABLE_NAME  +  " VALUES (?, ?)";
 
         SQLiteStatement statement = database.compileStatement(sql);
         statement.clearBindings();
 
-        statement.bindString(1, name);
-        statement.bindDouble(2, amount);
-        statement.bindDouble(3, price);
-
+        statement.bindDouble(1, id);
+        statement.bindDouble(2, soluong);
 
         statement.executeInsert();
     }

@@ -3,6 +3,7 @@ package com.example.legia.mobileweb;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.GridView;
 
 import com.example.legia.mobileweb.AdapterSanPham.GridViewAdapterSanPham;
@@ -20,10 +21,27 @@ public class gridProduct extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_grid_product);
 
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         gridProduct = findViewById(R.id.gridProduct);
 
         GetIntent();
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+
+                this.finish();
+                return true;
+
+
+        }
+        return false;
     }
 
     private void GetIntent(){

@@ -43,8 +43,14 @@
             android:layout_weight="1"
             android:text="TextView" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal"></LinearLayout>
+
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/btnMua"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:layout_marginLeft="20dp"

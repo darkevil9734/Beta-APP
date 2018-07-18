@@ -2,17 +2,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutAll"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
     <android.support.design.widget.BottomNavigationView
+        android:id="@+id/menuBar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="bottom"
         android:layout_alignParentBottom="true"
-        app:menu="@menu/bottom_menu" />
+        android:layout_gravity="bottom"
+        app:menu="@menu/bottom_menu">
+
+    </android.support.design.widget.BottomNavigationView>
 
     <ScrollView
         android:id="@+id/scroll"
@@ -50,8 +54,7 @@
                     android:layout_weight="1"
                     android:paddingBottom="5dp"
                     android:text="Apple"
-                    android:textSize="20sp"
-                     />
+                    android:textSize="20sp" />
 
                 <Button
                     android:id="@+id/btnChiTietApple"
@@ -61,7 +64,7 @@
                     android:background="@android:color/transparent"
                     android:gravity="right"
                     android:text="Xem chi tiết"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
@@ -141,9 +144,9 @@
                 app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
 
             <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/lbAsus"
@@ -154,15 +157,15 @@
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/btbChiTietAsus"
-                android:layout_width="250dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:gravity="right"
-                android:text="Xem chi tiết" />
-        </LinearLayout>
+                <Button
+                    android:id="@+id/btbChiTietAsus"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:gravity="right"
+                    android:text="Xem chi tiết" />
+            </LinearLayout>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/listAsus"
@@ -313,7 +316,7 @@
 
         </LinearLayout>
 
-    </ScrollView>
+    </ScrollView> -->
 
 
 </LinearLayout>

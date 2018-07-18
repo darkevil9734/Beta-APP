@@ -8,7 +8,11 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/activation" />
+            <option value="$PROJECT_DIR$/additionnal" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/javax.mail" />
+            <option value="$PROJECT_DIR$/mail" />
             <option value="$PROJECT_DIR$/mysql-connector-java-5.1.23-bin" />
           </set>
         </option>
