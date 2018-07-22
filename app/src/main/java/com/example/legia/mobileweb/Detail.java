@@ -65,7 +65,7 @@ public class Detail extends AppCompatActivity {
         btnSoSanh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<sanPham> dsSanPham = sanPhamDAO.DocTatCa();
+                List<sanPham> dsSanPham = sanPhamDAO.danhSachSoSanh(maSanPham);
                 AlertDialog.Builder builder = new AlertDialog.Builder(Detail.this);
 
                 // Set title value.

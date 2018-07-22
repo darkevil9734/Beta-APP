@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,25 +14,40 @@ import com.example.legia.mobileweb.DTO.sanPham;
 
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 
 public class sosanh extends AppCompatActivity {
     ImageView hinhSanPhamChinh, hinhSanPhamSoSanh;
-    TextView txtTenSPChinh, txtHangSPChinh, txtTinhTrangSPChinh, txtTinhNangSPChinh, txtCameraTruocSPChinh, txtCameraSauSPChinh, txtDungLuongPinSPChinh;
-    TextView txtTenSPSoSanh, txtHangSPSoSanh, txtTinhTrangSPSoSanh, txtTinhNangSPSoSanh, txtCameraTruocSPSoSanh, txtCameraSauSPSoSanh, txtDungLuongPinSPSoSanh;
+    TextView txtTenSPChinh,txtGiaSPChinh ,txtHangSPChinh, txtTinhTrangSPChinh, txtTinhNangSPChinh, txtCameraTruocSPChinh, txtCameraSauSPChinh, txtDungLuongPinSPChinh;
+    TextView txtTenSPSoSanh,txtGiaSPPhu ,txtHangSPSoSanh, txtTinhTrangSPSoSanh, txtTinhNangSPSoSanh, txtCameraTruocSPSoSanh, txtCameraSauSPSoSanh, txtDungLuongPinSPSoSanh;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sosanh);
 
+        this.setTitle("So sánh sản phẩm");
+
         // Sản phẩm chính
         hinhSanPhamChinh = findViewById(R.id.imgHinhA);
         txtTenSPChinh = findViewById(R.id.txtTenSPChinh);
-
+        txtGiaSPChinh = findViewById(R.id.txtGiaSPChinh);
+        txtCameraSauSPChinh = findViewById(R.id.txtCameraSauSPChinh);
+        txtCameraTruocSPChinh = findViewById(R.id.txtCameraTruocSPChinh);
+        txtHangSPChinh = findViewById(R.id.txtHangSPChinh);
+        txtTinhTrangSPChinh = findViewById(R.id.txtTinhTrangSPChinh);
+        txtTinhNangSPChinh = findViewById(R.id.txtChiTietSPChinh);
+        txtDungLuongPinSPChinh = findViewById(R.id.txtDungLuongPinSPChinh);
 
         // Sản phẩm so sánh
-        txtTenSPSoSanh = findViewById(R.id.txtTenSPSoSanh);
+        txtTenSPSoSanh = findViewById(R.id.txtTenSPPhu);
         hinhSanPhamSoSanh = findViewById(R.id.imgHinhB);
-
+        txtGiaSPPhu = findViewById(R.id.txtGiaSPPhu);
+        txtCameraSauSPSoSanh = findViewById(R.id.txtCameraSauSPPhu);
+        txtCameraTruocSPSoSanh = findViewById(R.id.txtCameraTruocSPPhu);
+        txtHangSPSoSanh = findViewById(R.id.txtHangSPPhu);
+        txtTinhTrangSPSoSanh = findViewById(R.id.txtTinhTrangSPPhu);
+        txtTinhNangSPSoSanh = findViewById(R.id.txtChiTietSPPhu);
+        txtDungLuongPinSPSoSanh = findViewById(R.id.txtDungLuongPinSPPhu);
 
         final int maSanPham, maSanPhamSoSanh;
 
@@ -50,7 +66,7 @@ public class sosanh extends AppCompatActivity {
             // LỖI
         }
     }
-
+    DecimalFormat df = new DecimalFormat("###,###.##");
     private void sanPhamChinh(int maSanPham){
         try {
             sanPham sanPhamChinh = sanPhamDAO.docTheoID(maSanPham);
@@ -62,6 +78,15 @@ public class sosanh extends AppCompatActivity {
 
             hinhSanPhamChinh.setImageBitmap(btm);
             txtTenSPChinh.setText(sanPhamChinh.getTenSanPham());
+            txtGiaSPChinh.setText(df.format(sanPhamChinh.getGiaSanPham())+"đ");
+            txtHangSPChinh.setText(sanPhamChinh.getHangSanXuat());
+            txtTinhTrangSPChinh.setText(sanPhamChinh.getTinhTrang());
+
+            txtCameraTruocSPChinh.setText(sanPhamChinh.getCamera_truoc());
+            txtCameraSauSPChinh.setText(sanPhamChinh.getCamera_sau());
+            txtDungLuongPinSPChinh.setText(sanPhamChinh.getDung_luong_pin());
+            txtTinhNangSPChinh.setText(Html.fromHtml(sanPhamChinh.getTinh_nang()));
+
         }
         catch (SQLException e){
 
@@ -80,6 +105,14 @@ public class sosanh extends AppCompatActivity {
 
             hinhSanPhamSoSanh.setImageBitmap(btm);
             txtTenSPSoSanh.setText(sanPhamSoSanh.getTenSanPham());
+            txtGiaSPPhu.setText(df.format(sanPhamSoSanh.getGiaSanPham())+"đ");
+            txtHangSPSoSanh.setText(sanPhamSoSanh.getHangSanXuat());
+            txtTinhTrangSPSoSanh.setText(sanPhamSoSanh.getTinhTrang());
+
+            txtCameraTruocSPSoSanh.setText(sanPhamSoSanh.getCamera_truoc());
+            txtCameraSauSPSoSanh.setText(sanPhamSoSanh.getCamera_sau());
+            txtDungLuongPinSPSoSanh.setText(sanPhamSoSanh.getDung_luong_pin());
+            txtTinhNangSPSoSanh.setText(Html.fromHtml(sanPhamSoSanh.getTinh_nang()));
         }
         catch (SQLException e){
 

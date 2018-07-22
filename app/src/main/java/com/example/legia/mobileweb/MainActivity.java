@@ -32,6 +32,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -39,6 +41,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import com.example.legia.mobileweb.AdapterSanPham.BottomNavigationViewHelper;
 import com.example.legia.mobileweb.AdapterSanPham.SanPhamAdapter;
 import com.example.legia.mobileweb.AdapterSanPham.SlidingAdapter;
 import com.example.legia.mobileweb.CheckInternet.CheckInternet;
@@ -88,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
         setContentView(R.layout.activity_main);
-
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
@@ -128,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (BadgesNotSupportedException badgesNotSupportedException) {
             Log.d(TAG, badgesNotSupportedException.getMessage());
         }
-
+        BottomNavigationViewHelper.disableShiftMode(menuBar);
         BottomNavigationMenuView bottomNavigationMenuView =
                 (BottomNavigationMenuView) menuBar.getChildAt(0);
         View v = bottomNavigationMenuView.getChildAt(2); // number of menu from left
@@ -143,12 +145,15 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.homePage:
                         break;
 
-                    case R.id.search:
+                    case R.id.news:
+                        Intent news = new Intent(MainActivity.this, menu_news.class);
+                        startActivity(news);
+                        break;
 
                     case R.id.cart:
                         if (b != null){
-                            Intent menu = new Intent(MainActivity.this, cart.class);
-                            startActivity(menu);
+                            Intent cart = new Intent(MainActivity.this, cart.class);
+                            startActivity(cart);
                         }
                         else{
                             AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(MainActivity.this);
@@ -195,7 +200,6 @@ public class MainActivity extends AppCompatActivity {
             }, DELAY_MS, PERIOD_MS);
 
             threadDanhSach();
-
 
             btnApple.setOnClickListener(new View.OnClickListener() {
                 @Override

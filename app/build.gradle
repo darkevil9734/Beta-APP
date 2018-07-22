@@ -48,7 +48,25 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
     implementation 'com.github.juanlabrador:badgecounter:1.0.2@aar'
 
+    //FACEBOOK
 
+
+}
+
+dependencies {
+    implementation 'com.android.support.constraint:constraint-layout:+'
+}
+
+dependencies {
+    implementation 'com.android.support.constraint:constraint-layout:+'
+}
+
+dependencies {
+    implementation 'com.android.support:support-v4:27.+'
+}
+
+dependencies {
+    implementation 'com.android.support.constraint:constraint-layout:+'
 }
 
 dependencies {

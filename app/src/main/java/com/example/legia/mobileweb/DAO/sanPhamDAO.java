@@ -45,6 +45,38 @@ public class sanPhamDAO {
 
     }
 
+    public static List<sanPham> danhSachSoSanh(int maSanPhamChinh){
+        List<sanPham> dsSanPhamSoSanh = null;
+        try {
+            Connection db = Database.connect();
+            Statement stm = db.createStatement();
+            ResultSet rs = stm.executeQuery("select*from hthong_muaban.san_pham where not ma_san_pham = '"+maSanPhamChinh+"'");
+            dsSanPhamSoSanh = new ArrayList<>();
+            while(rs.next()){
+                sanPham sp = new sanPham();
+                sp.setMa_san_pham(rs.getInt("ma_san_pham"));
+                sp.setTenSanPham(rs.getString("ten_san_pham"));
+                sp.setHangSanXuat(rs.getString("hang_san_xuat"));
+                sp.setGiaSanPham(rs.getInt("gia_san_pham"));
+                sp.setTinhTrang(rs.getString("tinh_trang"));
+                sp.setHinh_dai_dien(rs.getBlob("hinh_anh_mo_phong"));
+                sp.setCamera_truoc(rs.getString("camera_truoc"));
+                sp.setCamera_sau(rs.getString("camera_sau"));
+                sp.setDung_luong_pin(rs.getString("dung_luong_pin"));
+                sp.setTinh_nang(rs.getString("tinh_nang"));
+                sp.setBao_mat(rs.getString("bao_mat"));
+                sp.setMau_sac(rs.getString("mau_sac"));
+
+                dsSanPhamSoSanh.add(sp);
+            }
+            db.close();
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+        }
+        return dsSanPhamSoSanh;
+    }
+
     public static List<sanPham> timTheoTen(String tenSanPhamCanTim){
         List<sanPham> dsSanPham = null;
         try {

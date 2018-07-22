@@ -21,4 +21,6 @@
 
     <color name="btn_mua">#3F51B5</color>
     <color name="btn_so_sanh">#EA4335</color>
+
+    <color name="black_overlay">#66000000</color>
 </resources>
