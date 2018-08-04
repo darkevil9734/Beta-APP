@@ -39,7 +39,9 @@ public class sanPhamDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+
         }
+
 
         return dsSanPham;
 

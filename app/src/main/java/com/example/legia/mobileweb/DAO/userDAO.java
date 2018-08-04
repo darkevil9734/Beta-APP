@@ -71,6 +71,37 @@ public class userDAO {
         return status;
     }
 
+    public static User readUser(int iduser){
+        User u = null;
+        try {
+            Connection db = Database.connect();
+            String sql = "SELECT*FROM user WHERE iduser = ?";
+            PreparedStatement pst = db.prepareStatement(sql);
+            pst.setInt(1, iduser);
+
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()){
+                u = new User();
+                u.setIduser(rs.getInt("iduser"));
+                u.setPassword(rs.getString("password"));
+                u.setHo_user(rs.getString("ho_user"));
+                u.setTen_user(rs.getString("ten_user"));
+                u.setSdt(rs.getInt("sdt"));
+                u.setEmail(rs.getString("email"));
+                u.setDia_chi(rs.getString("dia_chi"));
+                u.setQuan(rs.getString("quan"));
+                u.setPhuong(rs.getString("phuong"));
+                u.setThanh_pho(rs.getString("thanh_pho"));
+                u.setNuoc(rs.getString("nuoc"));
+                u.setZip_code(rs.getString("zip_code"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return u;
+    }
+
     // reset password
     public static User ResetPassword(String username, String email) {
         User thanhVienQuenMatKhau = null;

@@ -11,6 +11,7 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Parcelable;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
@@ -48,10 +49,14 @@ import com.example.legia.mobileweb.CheckInternet.CheckInternet;
 import com.example.legia.mobileweb.DAO.sanPhamDAO;
 import com.example.legia.mobileweb.DAO.themVaoGioHang;
 import com.example.legia.mobileweb.DTO.sanPham;
+import com.example.legia.mobileweb.Database.Database;
 import com.github.arturogutierrez.Badges;
 import com.github.arturogutierrez.BadgesNotSupportedException;
 
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -175,155 +180,166 @@ public class MainActivity extends AppCompatActivity {
         });
 
         if(CheckInternet.checkConnection(this)){
+
             final SlidingAdapter adapter = new SlidingAdapter(this, hinh);
-            myPager.setAdapter(adapter);
+                myPager.setAdapter(adapter);
 
 
 
-            final Handler handler = new Handler();
-            final Runnable Update = new Runnable() {
-                public void run() {
-                    if (currentPage == adapter.getCount()) {
-                        currentPage = 0;
+                final Handler handler = new Handler(getMainLooper());
+                final Runnable Update = new Runnable() {
+                    public void run() {
+                        if (currentPage == adapter.getCount()) {
+                            currentPage = 0;
+                        }
+                        myPager.setCurrentItem(currentPage++, true);
                     }
-                    myPager.setCurrentItem(currentPage++, true);
-                }
-            };
+                };
 
-            timer = new Timer();
-            timer .schedule(new TimerTask() { // task to be scheduled
+                timer = new Timer();
+                timer .schedule(new TimerTask() { // task to be scheduled
 
-                @Override
-                public void run() {
-                    handler.post(Update);
-                }
-            }, DELAY_MS, PERIOD_MS);
+                    @Override
+                    public void run() {
+                        handler.post(Update);
+                    }
+                }, DELAY_MS, PERIOD_MS);
 
-            threadDanhSach();
+                Handler hdl = new Handler(Looper.getMainLooper());
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        handleDanhSach();
+                    }
+                };
+                hdl.post(runnable);
 
-            btnApple.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    brand = "Apple";
-                    type = "brandName";
-                    i = new Intent(MainActivity.this, gridProduct.class);
-                    Bundle b = new Bundle();
-                    b.putString("type", type);
-                    b.putString("brand", brand);
-                    i.putExtra("chiTiet", b);
+                btnApple.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        brand = "Apple";
+                        type = "brandName";
+                        i = new Intent(MainActivity.this, gridProduct.class);
+                        Bundle b = new Bundle();
+                        b.putString("type", type);
+                        b.putString("brand", brand);
+                        i.putExtra("chiTiet", b);
 
-                    startActivity(i);
-                }
-            });
+                        startActivity(i);
+                    }
+                });
 
-            btnSamsung.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    brand = "Samsung";
-                    type = "brandName";
-                    i = new Intent(MainActivity.this, gridProduct.class);
-                    Bundle b = new Bundle();
-                    b.putString("type", type);
-                    b.putString("brand", brand);
-                    i.putExtra("chiTiet", b);
+                btnSamsung.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        brand = "Samsung";
+                        type = "brandName";
+                        i = new Intent(MainActivity.this, gridProduct.class);
+                        Bundle b = new Bundle();
+                        b.putString("type", type);
+                        b.putString("brand", brand);
+                        i.putExtra("chiTiet", b);
 
-                    startActivity(i);
-                }
-            });
+                        startActivity(i);
+                    }
+                });
 
-            btnASus.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    brand = "Asus";
-                    type = "brandName";
-                    i = new Intent(MainActivity.this, gridProduct.class);
-                    Bundle b = new Bundle();
-                    b.putString("type", type);
-                    b.putString("brand", brand);
-                    i.putExtra("chiTiet", b);
+                btnASus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        brand = "Asus";
+                        type = "brandName";
+                        i = new Intent(MainActivity.this, gridProduct.class);
+                        Bundle b = new Bundle();
+                        b.putString("type", type);
+                        b.putString("brand", brand);
+                        i.putExtra("chiTiet", b);
 
-                    startActivity(i);
-                }
-            });
+                        startActivity(i);
+                    }
+                });
 
-            btnHTC.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    brand = "HTC";
-                    type = "brandName";
-                    i = new Intent(MainActivity.this, gridProduct.class);
-                    Bundle b = new Bundle();
-                    b.putString("type", type);
-                    b.putString("brand", brand);
-                    i.putExtra("chiTiet", b);
+                btnHTC.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        brand = "HTC";
+                        type = "brandName";
+                        i = new Intent(MainActivity.this, gridProduct.class);
+                        Bundle b = new Bundle();
+                        b.putString("type", type);
+                        b.putString("brand", brand);
+                        i.putExtra("chiTiet", b);
 
-                    startActivity(i);
-                }
-            });
+                        startActivity(i);
+                    }
+                });
 
-            btnDuoi1Trieu.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    type = "sorter";
-                    brand = "Dưới 1 Triệu";
-                    List<sanPham> dsSorter = danhSachDuoi1Trieu();
-                    i = new Intent(MainActivity.this, gridProduct.class);
-                    Bundle b = new Bundle();
-                    b.putString("type", type);
-                    b.putString("brand", brand);
-                    i.putExtra("chiTiet", b);
+                btnDuoi1Trieu.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        type = "sorter";
+                        brand = "Dưới 1 Triệu";
+                        List<sanPham> dsSorter = danhSachDuoi1Trieu();
+                        i = new Intent(MainActivity.this, gridProduct.class);
+                        Bundle b = new Bundle();
+                        b.putString("type", type);
+                        b.putString("brand", brand);
+                        i.putExtra("chiTiet", b);
 
-                    startActivity(i);
-                }
-            });
+                        startActivity(i);
+                    }
+                });
 
-            btn1Den3Trieu.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    type = "sorter";
-                    brand = "1 Đến 3 Triệu";
-                    List<sanPham> dsSorter = danhSachDuoi1Trieu();
-                    i = new Intent(MainActivity.this, gridProduct.class);
-                    Bundle b = new Bundle();
-                    b.putString("type", type);
-                    b.putString("brand", brand);
-                    i.putExtra("chiTiet", b);
+                btn1Den3Trieu.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        type = "sorter";
+                        brand = "1 Đến 3 Triệu";
+                        List<sanPham> dsSorter = danhSachDuoi1Trieu();
+                        i = new Intent(MainActivity.this, gridProduct.class);
+                        Bundle b = new Bundle();
+                        b.putString("type", type);
+                        b.putString("brand", brand);
+                        i.putExtra("chiTiet", b);
 
-                    startActivity(i);
-                }
-            });
+                        startActivity(i);
+                    }
+                });
 
-            btn3Den7Trieu.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    type = "sorter";
-                    brand = "3 Đến 7 Triệu";
-                    List<sanPham> dsSorter = danhSachDuoi1Trieu();
-                    i = new Intent(MainActivity.this, gridProduct.class);
-                    Bundle b = new Bundle();
-                    b.putString("type", type);
-                    b.putString("brand", brand);
-                    i.putExtra("chiTiet", b);
+                btn3Den7Trieu.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        type = "sorter";
+                        brand = "3 Đến 7 Triệu";
+                        List<sanPham> dsSorter = danhSachDuoi1Trieu();
+                        i = new Intent(MainActivity.this, gridProduct.class);
+                        Bundle b = new Bundle();
+                        b.putString("type", type);
+                        b.putString("brand", brand);
+                        i.putExtra("chiTiet", b);
 
-                    startActivity(i);
-                }
-            });
+                        startActivity(i);
+                    }
+                });
 
-            btnCaoCap.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    type = "sorter";
-                    brand = "Cao cấp";
-                    List<sanPham> dsSorter = danhSachDuoi1Trieu();
-                    i = new Intent(MainActivity.this, gridProduct.class);
-                    Bundle b = new Bundle();
-                    b.putString("type", type);
-                    b.putString("brand", brand);
-                    i.putExtra("chiTiet", b);
+                btnCaoCap.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        type = "sorter";
+                        brand = "Cao cấp";
+                        List<sanPham> dsSorter = danhSachDuoi1Trieu();
+                        i = new Intent(MainActivity.this, gridProduct.class);
+                        Bundle b = new Bundle();
+                        b.putString("type", type);
+                        b.putString("brand", brand);
+                        i.putExtra("chiTiet", b);
 
-                    startActivity(i);
-                }
-            });
+                        startActivity(i);
+                    }
+                });
+
+
+
 
 
         }
@@ -356,6 +372,18 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+
+    }
+
+    protected void handleDanhSach(){
+        Handler ds = new Handler(getMainLooper());
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+                threadDanhSach();
+            }
+        };
+        ds.post(run);
     }
 
 

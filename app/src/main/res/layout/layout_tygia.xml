@@ -12,6 +12,7 @@
             android:id="@+id/txtMaTyGia"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:layout_weight="1"
             android:text="TextView"
             android:textSize="18sp"
@@ -27,6 +28,7 @@
             android:id="@+id/txtGiaMua"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:layout_weight="1"
             android:text="TextView"
             android:textSize="18sp" />
@@ -41,6 +43,7 @@
             android:id="@+id/txtGiaBan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:layout_weight="1"
             android:text="TextView"
             android:textSize="18sp" />

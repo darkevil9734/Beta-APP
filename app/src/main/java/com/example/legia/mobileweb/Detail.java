@@ -4,6 +4,12 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
+import android.support.design.internal.BottomNavigationMenuView;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -18,12 +24,17 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.legia.mobileweb.AdapterSanPham.BottomNavigationViewHelper;
 import com.example.legia.mobileweb.AdapterSanPham.ListViewSanPhamSoSanh;
 import com.example.legia.mobileweb.AdapterSanPham.SanPhamAdapter;
 import com.example.legia.mobileweb.DAO.sanPhamDAO;
 import com.example.legia.mobileweb.DAO.themVaoGioHang;
 import com.example.legia.mobileweb.DTO.sanPham;
 
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 import com.github.juanlabrador.badgecounter.BadgeCounter;
 
 
@@ -36,6 +47,7 @@ import java.util.List;
 
 public class Detail extends AppCompatActivity {
     ImageView hinhSanPham;
+    BottomNavigationView menuChiTiet;
     Button btnThemVaoGio, btnSoSanh;
     TextView txtTenSanPhamChiTiet, txtHangSanXuatChiTiet, txtGiaSanPhamChiTiet, txtCameraTruocChiTiet, txtCameraSauChiTiet, txtTinhTrangChiTiet;
     int maSanPham;
@@ -45,6 +57,9 @@ public class Detail extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
+        //FacebookSdk.setApplicationId("254499031809848");
+        //FacebookSdk.sdkInitialize(Detail.this);
+
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -52,6 +67,7 @@ public class Detail extends AppCompatActivity {
         hinhSanPham = findViewById(R.id.imgHinhSanPham);
         btnThemVaoGio = findViewById(R.id.btnMua);
         btnSoSanh = findViewById(R.id.btnSoSanh);
+        menuChiTiet = findViewById(R.id.menuChiTiet);
 
         txtTenSanPhamChiTiet = findViewById(R.id.txtTenChiTietSanPham);
         txtHangSanXuatChiTiet = findViewById(R.id.txtHangChiTietSanPham);
@@ -60,8 +76,29 @@ public class Detail extends AppCompatActivity {
         txtGiaSanPhamChiTiet = findViewById(R.id.txtGiaTienChiTiet);
         txtTinhTrangChiTiet = findViewById(R.id.txtTinhTrangChiTietSanPham);
 
+        BottomNavigationViewHelper.disableShiftMode(menuChiTiet);
+        menuChiTiet.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.general:
+                        break;
+                    case R.id.comment:
+                        Intent intent = getIntent();
+                        Bundle b = intent.getBundleExtra("SanPhamChon");
+                        int id = b.getInt("MaSanPham");
+                        String url = "http://localhost:8081/web-mobile/xemChiTietSanPhamServlet?id="+id;
 
+                        Intent intent2 = new Intent(Detail.this, comment.class);
+                        intent2.putExtra("url", url);
+                        startActivity(intent2);
 
+                        break;
+                }
+                return false;
+
+            }
+        });
         btnSoSanh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,6 +118,18 @@ public class Detail extends AppCompatActivity {
                 AlertDialog dialog=builder.create();
 
                 dialog.show();
+
+            }
+        });
+
+        btnThemVaoGio.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onClick(View v) {
+                themVaoGioHang gioHang = SanPhamAdapter.gioHang;
+                gioHang.them(maSanPham, 1);
+
+                startActivity(new Intent(Detail.this, cart.class));
 
             }
         });
@@ -143,6 +192,19 @@ public class Detail extends AppCompatActivity {
             }
         }
 
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.share:
+                ShareLinkContent shareLinkContent = new ShareLinkContent.Builder()
+                        .setQuote("Chia sẻ")
+                        .build();
+                ShareDialog.show(this,shareLinkContent);
+                break;
+        }
         return true;
     }
 }

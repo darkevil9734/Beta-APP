@@ -6,8 +6,10 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -17,6 +19,7 @@ import android.widget.Toast;
 
 import com.example.legia.mobileweb.DAO.userDAO;
 import com.example.legia.mobileweb.DTO.User;
+import com.example.legia.mobileweb.Encryption.encrypt;
 
 import java.util.Properties;
 
@@ -59,10 +62,15 @@ public class login extends AppCompatActivity {
         btnForgetPass = findViewById(R.id.btnForgotPassword);
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {
                 String username = txtUsername.getText().toString();
                 String password = txtPassword.getText().toString();
+
+                username = encrypt.hashWith256(username);
+                password = encrypt.hashWith256(password);
+
                 if(username.length()==0){
                     txtUsername.setError("Bạn không được để trống");
                 }
@@ -73,9 +81,10 @@ public class login extends AppCompatActivity {
                 if(u != null){
                     SharedPreferences sp = getSharedPreferences("userLogin", MODE_PRIVATE);
                     SharedPreferences.Editor editor = sp.edit();
-                    editor.putString("username", username);
+                    editor.putString("username", u.getTen_user());
                     editor.putString("password", password);
                     editor.putBoolean("isLogin", true);
+                    editor.putInt("idUser", u.getIduser());
                     editor.commit();
 
 

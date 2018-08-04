@@ -32,6 +32,8 @@ public class tygia extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tygia);
 
+        this.setTitle("Xem tỉ giá online");
+
         listTyGia = findViewById(R.id.listTyGia);
         ListViewTyGia adapter = null;
 

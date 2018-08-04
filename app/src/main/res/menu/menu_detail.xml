@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/homePage"
+        android:id="@+id/general"
         android:layout_gravity="top"
         android:checkable="true"
         android:enabled="true"
@@ -11,12 +11,12 @@
         android:title="Tổng quan"
         app:showAsAction="always" />
     <item
-        android:id="@+id/search"
+        android:id="@+id/details"
         android:title="Chi tiết"
         app:actionViewClass="android.widget.SearchView"
         app:showAsAction="always" />
     <item
-        android:id="@+id/cart"
+        android:id="@+id/comment"
         android:enabled="true"
         android:title="Nhận xét"
         app:showAsAction="always"

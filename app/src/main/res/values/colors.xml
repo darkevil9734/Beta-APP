@@ -23,4 +23,7 @@
     <color name="btn_so_sanh">#EA4335</color>
 
     <color name="black_overlay">#66000000</color>
+
+    <color name="grayLight">#EEEEEE</color>
+    <color name="grayStrong">#95A5A6</color>
 </resources>

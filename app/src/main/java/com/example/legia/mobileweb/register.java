@@ -3,7 +3,9 @@ package com.example.legia.mobileweb;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,12 +17,13 @@ import android.widget.Toast;
 
 import com.example.legia.mobileweb.DAO.userDAO;
 import com.example.legia.mobileweb.DTO.User;
+import com.example.legia.mobileweb.Encryption.encrypt;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class register extends AppCompatActivity {
-    EditText txtHoTen, txtUsername, txtPassword, txtEmail;
+    EditText txtHoTen, txtUsername, txtPassword, txtEmail, txtDiaChi;
     Button btnLogin, btnRegister;
     ProgressDialog pd;
 
@@ -46,26 +49,33 @@ public class register extends AppCompatActivity {
         txtHoTen = findViewById(R.id.name);
         txtPassword = findViewById(R.id.password);
         txtEmail = findViewById(R.id.email);
+        txtDiaChi = findViewById(R.id.txtDiaChi);
         btnRegister = findViewById(R.id.btnRegister);
         btnLogin = findViewById(R.id.btnLinkToLoginScreen);
 
         btnRegister.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {
-                String hoten, username, password, email;
+                String hoten, username, password, passwordInput, email, diaChi;
                 hoten = txtHoTen.getText().toString();
                 username = txtUsername.getText().toString();
-                password = txtPassword.getText().toString();
+                passwordInput = txtPassword.getText().toString();
                 email = txtEmail.getText().toString();
+                diaChi = txtDiaChi.getText().toString();
 
+                username = encrypt.hashWith256(username);
+                password = encrypt.hashWith256(passwordInput);
                 if(hoten.length()==0){
                     txtHoTen.setError("Bạn không được bỏ trống");
                 }else if(username.length()==0){
                     txtUsername.setError("Bạn không được bỏ trống");
-                }else if(password.length()==0){
+                }else if(passwordInput.length()==0){
                     txtPassword.setError("Bạn không được bỏ trống");
                 }else if(email.length()==0){
                     txtEmail.setError("Bạn không được bỏ trống");
+                }else if(diaChi.length()==0){
+                    txtDiaChi.setError("Bạn không được bỏ trống");
                 }
                 else if(validateEmailAddress(email)==false){
                     txtEmail.setError("Bạn nhập không đúng định dạng Email");
@@ -83,7 +93,7 @@ public class register extends AppCompatActivity {
                             {
                                 try
                                 {
-                                    sleep(3000);  //Delay of 3 seconds
+                                    sleep(2000);  //Delay of 2 seconds
                                 }
                                 catch (Exception e) {}
                                 handler.sendEmptyMessage(0);
