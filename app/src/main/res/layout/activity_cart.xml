@@ -8,8 +8,8 @@
     tools:context=".cart">
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="60dp"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
         android:layout_weight="1"
         android:orientation="horizontal">
 
@@ -20,12 +20,12 @@
             android:layout_weight="1"
             android:text="Tổng tiền:" />
 
-        <ImageButton
-            android:id="@+id/btnPay"
+        <Button
+            android:id="@+id/btnOption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:srcCompat="@drawable/paypal" />
+            android:text="option" />
 
     </LinearLayout>
 

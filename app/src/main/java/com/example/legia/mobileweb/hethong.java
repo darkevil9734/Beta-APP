@@ -1,5 +1,12 @@
 package com.example.legia.mobileweb;
 
+import android.content.Context;
+import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import com.google.android.gms.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,8 +23,10 @@ import android.widget.Toast;
 import com.example.legia.mobileweb.AdapterHeThong.AdapterHeThongCuaHang;
 import com.example.legia.mobileweb.DTO.chiNhanh;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class hethong extends AppCompatActivity {
     Spinner cbChiNhanh;
@@ -37,6 +46,8 @@ public class hethong extends AppCompatActivity {
         cbChiNhanh = findViewById(R.id.cbChiNhanh);
         txtCount = findViewById(R.id.txtCount);
         listCuaHang = findViewById(R.id.listHeThong);
+
+        String quan = getCurrentLocate();
 
         List<String> danhSachQuan = new ArrayList<>();
         danhSachQuan.add("Quận 1");
@@ -272,8 +283,38 @@ public class hethong extends AppCompatActivity {
         switch (item.getItemId()){
             case android.R.id.home:
                 this.finish();
+                startActivity(new Intent(this, MainActivity.class));
                 return true;
         }
         return false;
+    }
+
+
+
+    private String getCurrentLocate(){
+        String quan = "";
+        try {
+            final double[] longitude = {0};
+            final double[] latitude = { 0 };
+            LocationListener locationListener = new LocationListener() {
+                public void onLocationChanged(Location location) {
+                    longitude[0] = location.getLongitude();
+                    latitude[0] = location.getLatitude();
+                }
+            };
+            Geocoder gcd = new Geocoder(this, Locale.getDefault());
+            List<Address> addresses = gcd.getFromLocation(latitude[0], longitude[0], 1);
+            if (addresses.size() > 0){
+                quan = addresses.get(0).getLocality();
+            }
+
+
+        }
+        catch(SecurityException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return quan;
     }
 }

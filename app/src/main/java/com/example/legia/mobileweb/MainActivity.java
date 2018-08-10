@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -73,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView listApple, listSamsung, listHTC, listAsus, listDuoi1Trieu, list1Den3Trieu, list3Den7Trieu, listCaoCap;
     ScrollView scrollView;
     Button btnApple, btnSamsung, btnHTC, btnASus, btnDuoi1Trieu, btn1Den3Trieu, btn3Den7Trieu, btnCaoCap;
-    TextView lbApple, lbSamsumg, lbAsus, lbHTC, lbDuoi1Trieu, lb1Den3Trieu, lb3Den7Trieu, lbCaoCap;
     BottomNavigationView menuBar;
 
     Timer timer;
@@ -83,6 +83,10 @@ public class MainActivity extends AppCompatActivity {
 
     Intent i = null;
     String brand, type = null;
+
+    private SharedPreferences spCountApp;
+    private SharedPreferences.Editor editorCount;
+    private int count = 0;
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -98,6 +102,22 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
+        // Optional
+        spCountApp = getSharedPreferences("countApp", MODE_PRIVATE);
+        // Get number of count:
+        count = spCountApp.getInt("countApp", 0);
+        if(count==10){
+            Toast.makeText(this, "RATE" , Toast.LENGTH_SHORT).show();
+            // Rating popup
+        }
+
+        // Count app open:
+        editorCount = spCountApp.edit();
+        editorCount.putInt("countApp", count+=1);
+        editorCount.commit();
+
+
 
         // findViewByID
         scrollView = findViewById(R.id.scroll);
@@ -121,15 +141,20 @@ public class MainActivity extends AppCompatActivity {
         btn3Den7Trieu = findViewById(R.id.btbChiTiet3Den7Trieu);
         btnCaoCap = findViewById(R.id.btbChiTietCaoCap);
 
-        //label
-        lbApple = findViewById(R.id.lbApple);
 
         // menu bar
         menuBar = findViewById(R.id.menuBar);
 
+        // Cách 1: intent truyền số lượng mua qua
         Intent cart = getIntent();
         final Bundle b = cart.getBundleExtra("GioHang");
+
+        // Cách 2: lấy từ SharedPrefence lên:
+        SharedPreferences sharedPreferences = getSharedPreferences("shareGioHang", MODE_PRIVATE);
+        final int soLuongMua = sharedPreferences.getInt("soLuongMua", 0);
+
         themVaoGioHang gioHang = SanPhamAdapter.gioHang;
+
         try {
             Badges.setBadge(this, gioHang.countSoLuongMua());
         } catch (BadgesNotSupportedException badgesNotSupportedException) {
@@ -139,8 +164,8 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationMenuView bottomNavigationMenuView =
                 (BottomNavigationMenuView) menuBar.getChildAt(0);
         View v = bottomNavigationMenuView.getChildAt(2); // number of menu from left
-        if(b != null){
-            new QBadgeView(this).bindTarget(v).setBadgeNumber(b.getInt("soLuongMua"));
+        if(soLuongMua > 0){
+            new QBadgeView(this).bindTarget(v).setBadgeNumber(soLuongMua);
         }
 
         menuBar.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -156,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
 
                     case R.id.cart:
-                        if (b != null){
+                        if (soLuongMua > 0){
                             Intent cart = new Intent(MainActivity.this, cart.class);
                             startActivity(cart);
                         }
@@ -548,7 +573,6 @@ public class MainActivity extends AppCompatActivity {
         listCaoCap.setLayoutManager(layoutManager);
         listCaoCap.setAdapter(adapter);
     }
-
 
 
 }

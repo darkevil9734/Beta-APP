@@ -19,6 +19,6 @@ public class ExampleUnitTest {
 
     @Test
     public void test() {
-        assertEquals(22200, DocTyGia.giaBan(), 0);
+        assertEquals(23330, DocTyGia.giaBan(), 0);
     }
 }

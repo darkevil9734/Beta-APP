@@ -456,7 +456,7 @@ public class sanPhamDAO {
     public static sanPham docTheoID(int id) {
         sanPham sp = null;
         Connection db = Database.connect();
-        String sql = "SELECT * FROM hthong_muaban.san_pham WHERE ma_san_pham =" + id;
+        String sql = "SELECT * FROM san_pham WHERE ma_san_pham =" + id;
         Statement stm;
 
         try {
@@ -646,5 +646,175 @@ public class sanPhamDAO {
             e.printStackTrace();
         }
         return dspk;
+    }
+
+    public static List<sanPham> timTheoHangGiaDuoi1Trieu(String brand){
+        List<sanPham> listDuoi1Trieu = new ArrayList<sanPham>();
+        try {
+            Connection db = Database.connect();
+            String sql = "SELECT * FROM hthong_muaban.san_pham where hang_san_xuat like N'%"+brand+"%' and gia_san_pham <=1000000;";
+            Statement stm = db.createStatement();
+            ResultSet rs = stm.executeQuery(sql);
+            while(rs.next()) {
+                sanPham sp = new sanPham();
+                sp.setMa_san_pham(rs.getInt("ma_san_pham"));
+                sp.setTenSanPham(rs.getString("ten_san_pham"));
+                sp.setHangSanXuat(rs.getString("hang_san_xuat"));
+                sp.setGiaSanPham(rs.getInt("gia_san_pham"));
+                sp.setTinhTrang(rs.getString("tinh_trang"));
+                sp.setHinh_dai_dien(rs.getBlob("hinh_anh_mo_phong"));
+                sp.setCamera_truoc(rs.getString("camera_truoc"));
+                sp.setCamera_sau(rs.getString("camera_sau"));
+                sp.setDung_luong_pin(rs.getString("dung_luong_pin"));
+                sp.setTinh_nang(rs.getString("tinh_nang"));
+                sp.setBao_mat(rs.getString("bao_mat"));
+                sp.setMau_sac(rs.getString("mau_sac"));
+                listDuoi1Trieu.add(sp);
+
+            }
+            db.close();
+        }
+        catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return listDuoi1Trieu;
+    }
+
+    public static List<sanPham> timTheoHangGia1Den3Trieu(String brand){
+        List<sanPham> list1Den3Trieu = new ArrayList<sanPham>();
+        try {
+            Connection db = Database.connect();
+            String sql = "SELECT * FROM hthong_muaban.san_pham where hang_san_xuat like N'%"+brand+"%' and gia_san_pham >=1000000 and gia_san_pham <= 3000000;";
+            Statement stm = db.createStatement();
+            ResultSet rs = stm.executeQuery(sql);
+            while(rs.next()) {
+                sanPham sp = new sanPham();
+                sp.setMa_san_pham(rs.getInt("ma_san_pham"));
+                sp.setTenSanPham(rs.getString("ten_san_pham"));
+                sp.setHangSanXuat(rs.getString("hang_san_xuat"));
+                sp.setGiaSanPham(rs.getInt("gia_san_pham"));
+                sp.setTinhTrang(rs.getString("tinh_trang"));
+                sp.setHinh_dai_dien(rs.getBlob("hinh_anh_mo_phong"));
+                sp.setCamera_truoc(rs.getString("camera_truoc"));
+                sp.setCamera_sau(rs.getString("camera_sau"));
+                sp.setDung_luong_pin(rs.getString("dung_luong_pin"));
+                sp.setTinh_nang(rs.getString("tinh_nang"));
+                sp.setBao_mat(rs.getString("bao_mat"));
+                sp.setMau_sac(rs.getString("mau_sac"));
+                list1Den3Trieu.add(sp);
+
+            }
+            db.close();
+        }
+        catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return list1Den3Trieu;
+    }
+
+    public static List<sanPham> timTheoHangGia3Den7rieu(String brand){
+        List<sanPham> list3Den7Trieu = new ArrayList<sanPham>();
+        try {
+            Connection db = Database.connect();
+            String sql = "SELECT * FROM hthong_muaban.san_pham where hang_san_xuat like N'%"+brand+"%' and gia_san_pham >=3000000 and gia_san_pham <= 7000000;";
+            Statement stm = db.createStatement();
+            ResultSet rs = stm.executeQuery(sql);
+            while(rs.next()) {
+                sanPham sp = new sanPham();
+                sp.setMa_san_pham(rs.getInt("ma_san_pham"));
+                sp.setTenSanPham(rs.getString("ten_san_pham"));
+                sp.setHangSanXuat(rs.getString("hang_san_xuat"));
+                sp.setGiaSanPham(rs.getInt("gia_san_pham"));
+                sp.setTinhTrang(rs.getString("tinh_trang"));
+                sp.setHinh_dai_dien(rs.getBlob("hinh_anh_mo_phong"));
+                sp.setCamera_truoc(rs.getString("camera_truoc"));
+                sp.setCamera_sau(rs.getString("camera_sau"));
+                sp.setDung_luong_pin(rs.getString("dung_luong_pin"));
+                sp.setTinh_nang(rs.getString("tinh_nang"));
+                sp.setBao_mat(rs.getString("bao_mat"));
+                sp.setMau_sac(rs.getString("mau_sac"));
+                list3Den7Trieu.add(sp);
+
+            }
+            db.close();
+        }
+        catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return list3Den7Trieu;
+    }
+
+    public static List<sanPham> timTheoHangGia7Den10rieu(String brand){
+        List<sanPham> list7Den10Trieu = new ArrayList<sanPham>();
+        try {
+            Connection db = Database.connect();
+            String sql = "SELECT * FROM hthong_muaban.san_pham where hang_san_xuat like N'%"+brand+"%' and gia_san_pham >=7000000 and gia_san_pham <= 10000000;";
+            Statement stm = db.createStatement();
+            ResultSet rs = stm.executeQuery(sql);
+            while(rs.next()) {
+                sanPham sp = new sanPham();
+                sp.setMa_san_pham(rs.getInt("ma_san_pham"));
+                sp.setTenSanPham(rs.getString("ten_san_pham"));
+                sp.setHangSanXuat(rs.getString("hang_san_xuat"));
+                sp.setGiaSanPham(rs.getInt("gia_san_pham"));
+                sp.setTinhTrang(rs.getString("tinh_trang"));
+                sp.setHinh_dai_dien(rs.getBlob("hinh_anh_mo_phong"));
+                sp.setCamera_truoc(rs.getString("camera_truoc"));
+                sp.setCamera_sau(rs.getString("camera_sau"));
+                sp.setDung_luong_pin(rs.getString("dung_luong_pin"));
+                sp.setTinh_nang(rs.getString("tinh_nang"));
+                sp.setBao_mat(rs.getString("bao_mat"));
+                sp.setMau_sac(rs.getString("mau_sac"));
+                list7Den10Trieu.add(sp);
+
+            }
+            db.close();
+        }
+        catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return list7Den10Trieu;
+    }
+
+    public static List<sanPham> timTheoHangGiaTren10Trieu(String brand){
+        List<sanPham> listTren10Trieu = new ArrayList<sanPham>();
+        try {
+            Connection db = Database.connect();
+            String sql = "SELECT * FROM hthong_muaban.san_pham where hang_san_xuat like N'%"+brand+"%' and gia_san_pham >=10000000;";
+            Statement stm = db.createStatement();
+            ResultSet rs = stm.executeQuery(sql);
+            while(rs.next()) {
+                sanPham sp = new sanPham();
+                sp.setMa_san_pham(rs.getInt("ma_san_pham"));
+                sp.setTenSanPham(rs.getString("ten_san_pham"));
+                sp.setHangSanXuat(rs.getString("hang_san_xuat"));
+                sp.setGiaSanPham(rs.getInt("gia_san_pham"));
+                sp.setTinhTrang(rs.getString("tinh_trang"));
+                sp.setHinh_dai_dien(rs.getBlob("hinh_anh_mo_phong"));
+                sp.setCamera_truoc(rs.getString("camera_truoc"));
+                sp.setCamera_sau(rs.getString("camera_sau"));
+                sp.setDung_luong_pin(rs.getString("dung_luong_pin"));
+                sp.setTinh_nang(rs.getString("tinh_nang"));
+                sp.setBao_mat(rs.getString("bao_mat"));
+                sp.setMau_sac(rs.getString("mau_sac"));
+                listTren10Trieu.add(sp);
+
+            }
+            db.close();
+        }
+        catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return listTren10Trieu;
     }
 }

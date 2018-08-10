@@ -11,12 +11,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.legia.mobileweb.AdapterHeThong.AdapterOptionPayment;
 import com.example.legia.mobileweb.AdapterSanPham.ListViewGioHangAdapter;
 import com.example.legia.mobileweb.AdapterSanPham.SanPhamAdapter;
 import com.example.legia.mobileweb.DAO.hoaDonDAO;
@@ -24,6 +26,7 @@ import com.example.legia.mobileweb.DAO.themVaoGioHang;
 import com.example.legia.mobileweb.DAO.userDAO;
 import com.example.legia.mobileweb.DTO.User;
 import com.example.legia.mobileweb.DTO.hoaDon;
+import com.example.legia.mobileweb.DTO.payment;
 import com.example.legia.mobileweb.DTO.sanPhamMua;
 import com.example.legia.mobileweb.TyGia.DocTyGia;
 import com.paypal.android.sdk.payments.PayPalConfiguration;
@@ -36,6 +39,7 @@ import org.json.JSONException;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -50,6 +54,7 @@ import javax.mail.internet.MimeMessage;
 public class cart extends AppCompatActivity {
     ListView dsGioHang;
     ImageButton btnPay;
+    Button btnOption;
     themVaoGioHang gioHang;
     TextView totalMoney;
 
@@ -76,8 +81,9 @@ public class cart extends AppCompatActivity {
 
         Toast.makeText(this, "Giá usd : " + DocTyGia.giaBan(), Toast.LENGTH_SHORT).show();
         dsGioHang = findViewById(R.id.listCart);
-        btnPay = findViewById(R.id.btnPay);
+        //btnPay = findViewById(R.id.btnPay);
         totalMoney = findViewById(R.id.lbTotal);
+        btnOption = findViewById(R.id.btnOption);
 
         gioHang = SanPhamAdapter.gioHang;
         this.setTitle("Giỏ hàng ( " + gioHang.countSoLuongMua() + " sản phẩm )" );
@@ -91,7 +97,39 @@ public class cart extends AppCompatActivity {
         totalMoney.setText("Tổng tiền : "+ df.format(gioHang.tongTien())+" VNĐ");
 
         Log.i("test", DocTyGia.giaBan()+"");
-        btnPay.setOnClickListener(new View.OnClickListener() {
+
+        btnOption.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // option
+                List<payment> dsPayment = new ArrayList<>();
+                dsPayment.add(new payment(1, R.drawable.paypallogo));
+                dsPayment.add(new payment(2, R.drawable.onepaylogo));
+                //dsPayment.add(new payment(3, R.drawable.vnpay));
+                dsPayment.add(new payment(4, R.drawable.cod));
+                dsPayment.add(new payment(5, R.drawable.vtc));
+
+                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(cart.this);
+
+                // Set title value.
+                builder.setTitle("Chọn hình thức thanh toán: ");
+
+                AdapterOptionPayment adapterOptionPayment = new AdapterOptionPayment(cart.this, dsPayment);
+                ListView lv = new ListView(cart.this);
+
+                lv.setAdapter(adapterOptionPayment);
+
+                builder.setView(lv);
+                android.support.v7.app.AlertDialog dialog=builder.create();
+
+                dialog.show();
+
+
+
+            }
+        });
+
+        /*btnPay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(sp.getBoolean("isLogin", false)){
@@ -210,9 +248,9 @@ public class cart extends AppCompatActivity {
                     alertDialog.show();
                 }
 
-               /* */
+               *//* *//*
             }
-        });
+        });*/
 
         List<sanPhamMua> dsSanPhamMua = gioHang.danhSachSanPhamMua();
         ListViewGioHangAdapter gioHangAdapter = new ListViewGioHangAdapter(this, dsSanPhamMua);
@@ -226,6 +264,7 @@ public class cart extends AppCompatActivity {
         switch (item.getItemId()){
             case android.R.id.home:
                 this.finish();
+                startActivity(new Intent(this, MainActivity.class));
                 return true;
         }
         return false;
@@ -257,6 +296,12 @@ public class cart extends AppCompatActivity {
                     }
 
                     User u = userDAO.readUser(iduser);
+
+                    SharedPreferences sharedPreferencesInfo = getSharedPreferences("info_khach_hang", MODE_PRIVATE);
+                    diaChi = sharedPreferencesInfo.getString("diaChi", "");
+                    phuong = sharedPreferencesInfo.getString("phuong", "");
+                    quan = sharedPreferencesInfo.getString("quan", "");
+                    soDienThoai = sharedPreferencesInfo.getInt("sdt", 0);
 
                     hoaDon hd = new hoaDon();
                     hd.setId_user(iduser);
@@ -335,6 +380,8 @@ public class cart extends AppCompatActivity {
         super.onDestroy();
         stopService(new Intent(this, PayPalService.class));
     }
+
+
 
 
 }

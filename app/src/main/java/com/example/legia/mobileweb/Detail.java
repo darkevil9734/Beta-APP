@@ -15,20 +15,27 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.legia.mobileweb.AdapterSanPham.BottomNavigationViewHelper;
 import com.example.legia.mobileweb.AdapterSanPham.ListViewSanPhamSoSanh;
 import com.example.legia.mobileweb.AdapterSanPham.SanPhamAdapter;
 import com.example.legia.mobileweb.DAO.sanPhamDAO;
 import com.example.legia.mobileweb.DAO.themVaoGioHang;
+import com.example.legia.mobileweb.DTO.giaSpinner;
+import com.example.legia.mobileweb.DTO.hangSpinner;
 import com.example.legia.mobileweb.DTO.sanPham;
 
 import com.facebook.FacebookSdk;
@@ -99,22 +106,264 @@ public class Detail extends AppCompatActivity {
 
             }
         });
+
+        // Thêm mục options
         btnSoSanh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<sanPham> dsSanPham = sanPhamDAO.danhSachSoSanh(maSanPham);
+
+                final Spinner cboHang, cboGia;
+                final ListView listDanhSachSoSanh;
+
+                LayoutInflater li = LayoutInflater.from(Detail.this);
+                final View viewSoSanh = li.inflate(R.layout.layout_sosanh, null);
+
+                cboHang = viewSoSanh.findViewById(R.id.spinnerHang);
+                cboGia = viewSoSanh.findViewById(R.id.spinnerGia);
+                listDanhSachSoSanh = viewSoSanh.findViewById(R.id.listDanhSachSoSanh);
+
+                List<String> dsGiaSpinner = new ArrayList<>();
+                dsGiaSpinner.add("--Chọn mức giá--");
+                dsGiaSpinner.add("Dưới 1 Triệu");
+                dsGiaSpinner.add("1 - 3 Triệu");
+                dsGiaSpinner.add("3 - 7 Triệu");
+                dsGiaSpinner.add("7 - 10 Triệu");
+                dsGiaSpinner.add("Trên 10 Triệu");
+
+                List<String> dsHangSpinner = new ArrayList<>();
+                dsHangSpinner.add("Apple");
+                dsHangSpinner.add("Samsung");
+                dsHangSpinner.add("Oppo");
+                dsHangSpinner.add("Sony");
+                dsHangSpinner.add("Asus");
+                dsHangSpinner.add("HTC");
+                dsHangSpinner.add("Nokia");
+                dsHangSpinner.add("Philips");
+                dsHangSpinner.add("Vivo");
+
+                // Creating adapter for spinner
+                ArrayAdapter<String> giaSpinnerArrayAdapter = new ArrayAdapter<>(Detail.this, android.R.layout.simple_spinner_item, dsGiaSpinner);
+
+                // Drop down layout style - list view with radio button
+                giaSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                // Creating adapter for spinner
+                ArrayAdapter<String> hangSpinnerArrayAdapter = new ArrayAdapter<>(Detail.this, android.R.layout.simple_spinner_item, dsHangSpinner);
+
+                // Drop down layout style - list view with radio button
+                hangSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                cboGia.setAdapter(giaSpinnerArrayAdapter);
+                cboHang.setAdapter(hangSpinnerArrayAdapter);
+
+                Intent intent = getIntent();
+                Bundle bundle = intent.getBundleExtra("SanPhamChon");
+                maSanPham = bundle.getInt("MaSanPham");
+
+                sanPham sanPham = DocChiTiet(maSanPham);
+                String hang_default = sanPham.getHangSanXuat();
+
+                int position = dsHangSpinner.indexOf(hang_default);
+                cboHang.setSelection(position);
+
+                // Spinner giá sản phẩm
+                cboGia.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        String hangSP = cboHang.getSelectedItem().toString();
+                        ListViewSanPhamSoSanh adapterSoSanh;
+
+                        switch (position){
+                            case 0:
+                                List<sanPham> listSanPhamHang = sanPhamDAO.timKiemTheoHang(hangSP);
+                                adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, listSanPhamHang, maSanPham);
+                                listDanhSachSoSanh.setAdapter(adapterSoSanh);
+                                break;
+                            case 1: // Dưới 1 Triệu
+                                List<sanPham> listDuoi1Trieu = sanPhamDAO.timTheoHangGiaDuoi1Trieu(hangSP);
+                                adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, listDuoi1Trieu, maSanPham);
+                                listDanhSachSoSanh.setAdapter(adapterSoSanh);
+                                break;
+                            case 2: // 1 - 3 Triệu
+                                List<sanPham> list1Den3Trieu = sanPhamDAO.timTheoHangGia1Den3Trieu(hangSP);
+                                adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, list1Den3Trieu, maSanPham);
+                                listDanhSachSoSanh.setAdapter(adapterSoSanh);
+                                break;
+                            case 3: // 3- 7 Triệu
+                                List<sanPham> list3Den7Trieu = sanPhamDAO.timTheoHangGia3Den7rieu(hangSP);
+                                adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, list3Den7Trieu, maSanPham);
+                                listDanhSachSoSanh.setAdapter(adapterSoSanh);
+                                break;
+                            case 4: // 7 - 10 Triệu
+                                List<sanPham> list7Den10Trieu = sanPhamDAO.timTheoHangGia7Den10rieu(hangSP);
+                                adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, list7Den10Trieu, maSanPham);
+                                listDanhSachSoSanh.setAdapter(adapterSoSanh);
+                                break;
+                            case 5: // Trên 10 Triệu
+                                List<sanPham> listTren10Trieu = sanPhamDAO.timTheoHangGiaTren10Trieu(hangSP);
+                                adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, listTren10Trieu, maSanPham);
+                                listDanhSachSoSanh.setAdapter(adapterSoSanh);
+                                break;
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                // Spinner hãng sản phẩm
+                cboHang.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        String mucGia = cboGia.getSelectedItem().toString();
+                        String hangSP = cboHang.getSelectedItem().toString();
+                        ListViewSanPhamSoSanh adapterSoSanh;
+
+                        switch (position){
+                            case 0: // Apple
+                                switch (mucGia){
+                                    case "Dưới 1 Triệu":
+                                        List<sanPham> listDuoi1Trieu = sanPhamDAO.timTheoHangGiaDuoi1Trieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, listDuoi1Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                        break;
+                                    case "1 - 3 Triệu":
+                                        List<sanPham> list1Den3Trieu = sanPhamDAO.timTheoHangGia1Den3Trieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, list1Den3Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                        break;
+                                    case "3 - 7 Triệu":
+                                        List<sanPham> list3Den7Trieu = sanPhamDAO.timTheoHangGia3Den7rieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, list3Den7Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                        break;
+                                    case "7 - 10 Triệu":
+                                        List<sanPham> list7Den10Trieu = sanPhamDAO.timTheoHangGia7Den10rieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, list7Den10Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                         break;
+                                    case "Trên 10 Triệu":
+                                        List<sanPham> listTren10Trieu = sanPhamDAO.timTheoHangGiaTren10Trieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, listTren10Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);
+                                        break;
+                                }
+                                break;
+                            case 1:
+                                switch (mucGia){
+                                    case "Dưới 1 Triệu":
+                                        List<sanPham> listDuoi1Trieu = sanPhamDAO.timTheoHangGiaDuoi1Trieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, listDuoi1Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                        break;
+                                    case "1 - 3 Triệu":
+                                        List<sanPham> list1Den3Trieu = sanPhamDAO.timTheoHangGia1Den3Trieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, list1Den3Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                        break;
+                                    case "3 - 7 Triệu":
+                                        List<sanPham> list3Den7Trieu = sanPhamDAO.timTheoHangGia3Den7rieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, list3Den7Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                        break;
+                                    case "7 - 10 Triệu":
+                                        List<sanPham> list7Den10Trieu = sanPhamDAO.timTheoHangGia7Den10rieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, list7Den10Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                         break;
+                                    case "Trên 10 Triệu":
+                                        List<sanPham> listTren10Trieu = sanPhamDAO.timTheoHangGiaTren10Trieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, listTren10Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);
+                                        break;
+                                }
+                                break;
+                            case 2:
+                                switch (mucGia){
+                                    case "Dưới 1 Triệu":
+                                        List<sanPham> listDuoi1Trieu = sanPhamDAO.timTheoHangGiaDuoi1Trieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, listDuoi1Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                        break;
+                                    case "1 - 3 Triệu":
+                                        List<sanPham> list1Den3Trieu = sanPhamDAO.timTheoHangGia1Den3Trieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, list1Den3Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                        break;
+                                    case "3 - 7 Triệu":
+                                        List<sanPham> list3Den7Trieu = sanPhamDAO.timTheoHangGia3Den7rieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, list3Den7Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                        break;
+                                    case "7 - 10 Triệu":
+                                        List<sanPham> list7Den10Trieu = sanPhamDAO.timTheoHangGia7Den10rieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, list7Den10Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                         break;
+                                    case "Trên 10 Triệu":
+                                        List<sanPham> listTren10Trieu = sanPhamDAO.timTheoHangGiaTren10Trieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, listTren10Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);
+                                        break;
+                                }
+                                break;
+                            case 3:
+                                switch (mucGia){
+                                    case "Dưới 1 Triệu":
+                                        List<sanPham> listDuoi1Trieu = sanPhamDAO.timTheoHangGiaDuoi1Trieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, listDuoi1Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                        break;
+                                    case "1 - 3 Triệu":
+                                        List<sanPham> list1Den3Trieu = sanPhamDAO.timTheoHangGia1Den3Trieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, list1Den3Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                        break;
+                                    case "3 - 7 Triệu":
+                                        List<sanPham> list3Den7Trieu = sanPhamDAO.timTheoHangGia3Den7rieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, list3Den7Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                        break;
+                                    case "7 - 10 Triệu":
+                                        List<sanPham> list7Den10Trieu = sanPhamDAO.timTheoHangGia7Den10rieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, list7Den10Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                         break;
+                                    case "Trên 10 Triệu":
+                                        List<sanPham> listTren10Trieu = sanPhamDAO.timTheoHangGiaTren10Trieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, listTren10Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);
+                                        break;
+                                }
+                                break;
+                            case 4:
+                                switch (mucGia){
+                                    case "Dưới 1 Triệu":
+                                        List<sanPham> listDuoi1Trieu = sanPhamDAO.timTheoHangGiaDuoi1Trieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, listDuoi1Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                        break;
+                                    case "1 - 3 Triệu":
+                                        List<sanPham> list1Den3Trieu = sanPhamDAO.timTheoHangGia1Den3Trieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, list1Den3Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                        break;
+                                    case "3 - 7 Triệu":
+                                        List<sanPham> list3Den7Trieu = sanPhamDAO.timTheoHangGia3Den7rieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, list3Den7Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                        break;
+                                    case "7 - 10 Triệu":
+                                        List<sanPham> list7Den10Trieu = sanPhamDAO.timTheoHangGia7Den10rieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, list7Den10Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);                                         break;
+                                    case "Trên 10 Triệu":
+                                        List<sanPham> listTren10Trieu = sanPhamDAO.timTheoHangGiaTren10Trieu(hangSP);
+                                        adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, listTren10Trieu, maSanPham);
+                                        listDanhSachSoSanh.setAdapter(adapterSoSanh);
+                                        break;
+                                }
+                                break;
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(Detail.this);
 
                 // Set title value.
                 builder.setTitle("Chọn sản phẩm cần so sánh");
-                int listItemLen = dsSanPham.size();
+                builder.setView(viewSoSanh);
 
-                ListViewSanPhamSoSanh adapterSoSanh = new ListViewSanPhamSoSanh(Detail.this, dsSanPham, maSanPham);
-                ListView lv = new ListView(Detail.this);
 
-                lv.setAdapter(adapterSoSanh);
 
-                builder.setView(lv);
                 AlertDialog dialog=builder.create();
 
                 dialog.show();

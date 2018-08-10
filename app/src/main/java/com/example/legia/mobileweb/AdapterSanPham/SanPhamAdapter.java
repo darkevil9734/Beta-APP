@@ -106,6 +106,10 @@ public class SanPhamAdapter extends RecyclerView.Adapter<SanPhamAdapter.SanPhamV
 
                     gioHang.them(maSanPhamMua, soLuongMua);
 
+                    SharedPreferences sp = context.getSharedPreferences("shareGioHang", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putInt("soLuongMua", gioHang.countSoLuongMua());
+                    editor.commit();
 
                     mainNoti();
                     Log.i("count", "Tổng tiền: " + gioHang.tongTien());
