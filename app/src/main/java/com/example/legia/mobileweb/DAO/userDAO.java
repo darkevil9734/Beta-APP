@@ -2,6 +2,7 @@ package com.example.legia.mobileweb.DAO;
 
 import com.example.legia.mobileweb.DTO.User;
 import com.example.legia.mobileweb.Database.Database;
+import com.example.legia.mobileweb.Encryption.encrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,17 +10,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class userDAO {
+public class    userDAO {
     public static User Login(String username, String password) {
         User thanhVienDangNhap = null;
         Connection db = Database.connect();
         PreparedStatement pst = null;
+        String user = encrypt.md5(username);
+        String pass = encrypt.md5(password);
 
         try {
             String sql = "SELECT * FROM user where username = ?  and password = ?";
             pst = db.prepareStatement(sql);
-            pst.setString(1, username);
-            pst.setString(2, password);
+            pst.setString(1, user);
+            pst.setString(2, pass);
             ResultSet rs = pst.executeQuery();
 
 
@@ -37,7 +40,7 @@ public class userDAO {
                 thanhVienDangNhap.setThanh_pho(rs.getString("thanh_pho"));
                 thanhVienDangNhap.setNuoc(rs.getString("nuoc"));
                 thanhVienDangNhap.setZip_code(rs.getString("zip_code"));
-
+                thanhVienDangNhap.setId_the_tich_diem(rs.getInt("id_the_tich_diem"));
             }
             db.close();
         } catch (SQLException e) {
@@ -52,16 +55,30 @@ public class userDAO {
         int status=0;
         Connection db = Database.connect();
         try {
+            int the_tich_diem =0;
+            Statement stm = db.createStatement();
+            ResultSet rs = stm.executeQuery("SELECT id_the_tich_diem FROM user order by iduser desc Limit 1;");
+            while (rs.next()){
+                the_tich_diem = rs.getInt("id_the_tich_diem");
 
-            PreparedStatement pst = db.prepareStatement("INSERT INTO user(username, password, ho_user, ten_user, email) VALUES(?,?,?,?,?)");
-
-            pst.setString(1, thanhVien.getUsername());
-            pst.setString(2, thanhVien.getPassword());
+            }
+            the_tich_diem+=1;
+            PreparedStatement pst2 = db.prepareStatement("INSERT INTO the_tich_diem(id_the_tich_diem) VALUES(?)");
+            PreparedStatement pst = db.prepareStatement("INSERT INTO user(username, password, ho_user, ten_user, email, id_the_tich_diem) VALUES(?,?,?,?,?,?)");
+            String user = encrypt.md5(thanhVien.getUsername());
+            String pass = encrypt.md5(thanhVien.getPassword());
+            pst.setString(1, user);
+            pst.setString(2, pass);
             pst.setString(3, thanhVien.getHo_user());
             pst.setString(4, thanhVien.getTen_user());
             pst.setString(5, thanhVien.getEmail());
+            pst.setInt(6,the_tich_diem);
+
+            pst2.setInt(1, the_tich_diem);
+            int stt_the_tich_diem = pst2.executeUpdate();
 
             status = pst.executeUpdate();
+
             db.close();
         } catch (SQLException e) {
             // TODO Auto-generated catch block
@@ -94,7 +111,10 @@ public class userDAO {
                 u.setThanh_pho(rs.getString("thanh_pho"));
                 u.setNuoc(rs.getString("nuoc"));
                 u.setZip_code(rs.getString("zip_code"));
+                u.setId_the_tich_diem(rs.getInt("id_the_tich_diem"));
+
             }
+            db.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -111,7 +131,7 @@ public class userDAO {
         try {
             String sql = "select*from hthong_muaban.user where username = ? and email = ? ";
             pst = db.prepareStatement(sql);
-            pst.setString(1, username);
+            pst.setString(1, encrypt.md5(username));
             pst.setString(2, email);
             ResultSet rs = pst.executeQuery();
 
@@ -161,10 +181,98 @@ public class userDAO {
                 nd.setNuoc(rs.getString("nuoc"));
                 nd.setZip_code(rs.getString("zip_code"));
             }
+            db.close();
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return nd;
+    }
+
+    public static int layLoaiTheUser(int idUser){
+        int loaiThe = 0;
+        try {
+            Connection db = Database.connect();
+            String sql = "SELECT `id_loai_the`" +
+                    "FROM user " +
+                    "INNER JOIN the_tich_diem " +
+                    "ON the_tich_diem.id_the_tich_diem = user.id_the_tich_diem WHERE user.iduser = " + idUser;
+
+            Statement stm = db.createStatement();
+
+            ResultSet rs = stm.executeQuery(sql);
+            while(rs.next()){
+                loaiThe = rs.getInt("id_loai_the");
+            }
+            db.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return loaiThe;
+    }
+
+    public static User readInfo(int id_user){
+        User user = null;
+        try {
+            Connection db = Database.connect();
+            String sql = "SELECT user.ten_user, loai_the.loai_the, the_tich_diem.diem_tich_luy\n" +
+                    "FROM hthong_muaban.user " +
+                    "inner join the_tich_diem on the_tich_diem.id_the_tich_diem = user.id_the_tich_diem\n" +
+                    "inner join loai_the on loai_the.id_loai_the = the_tich_diem.id_loai_the\n" +
+                    "where user.iduser = ?";
+            PreparedStatement pst = db.prepareStatement(sql);
+            pst.setInt(1, id_user);
+            ResultSet rs = pst.executeQuery();
+            while(rs.next()){
+                user = new User();
+                user.setTen_user(rs.getString("ten_user"));
+                user.setLoai_the(rs.getString("loai_the"));
+                user.setDiem(rs.getInt("diem_tich_luy"));
+            }
+            db.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return user;
+    }
+
+    //update password
+    public static int updatePassword(int iduser, String newPassword){
+        int update = 0;
+        try {
+            Connection db = Database.connect();
+            String sql = "UPDATE `user` SET `password`=?  WHERE `iduser`= ?;";
+            PreparedStatement pst = db.prepareStatement(sql);
+            pst.setString(1, encrypt.md5(newPassword));
+            pst.setInt(2, iduser);
+
+            update = pst.executeUpdate();
+            db.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return update;
+    }
+
+    //update user information
+    public static int updateInfoUser(int iduser, String diaChi, String phuong, String quan, int sdt){
+        int update = 0;
+        try {
+            Connection db = Database.connect();
+            String sql = "UPDATE `user` SET `sdt`= ? , `dia_chi`=? , `quan`= ?, " +
+                    "`phuong`= ? WHERE `iduser`= ? ;";
+            PreparedStatement pst = db.prepareStatement(sql);
+            pst.setInt(1, sdt);
+            pst.setString(2, diaChi);
+            pst.setString(3, quan);
+            pst.setString(4, phuong);
+            pst.setInt(5, iduser);
+
+            update = pst.executeUpdate();
+            db.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return update;
     }
 }

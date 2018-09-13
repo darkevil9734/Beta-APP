@@ -1,11 +1,8 @@
 package com.example.legia.mobileweb;
 
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
@@ -15,13 +12,16 @@ import android.view.Menu;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.legia.mobileweb.AdapterHeThong.AdapterMenuMain;
 import com.example.legia.mobileweb.AdapterSanPham.BottomNavigationViewHelper;
-import com.example.legia.mobileweb.AdapterSanPham.ListGopY;
-import com.example.legia.mobileweb.DTO.gopY;
+import com.example.legia.mobileweb.DAO.userDAO;
+import com.example.legia.mobileweb.DTO.User;
+import com.example.legia.mobileweb.DTO.menuMain;
+import com.facebook.Profile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +30,7 @@ import q.rorbin.badgeview.QBadgeView;
 
 public class menu extends AppCompatActivity {
     BottomNavigationView menuBar;
-    Button btnLogin, btnGopY, btnContact, btnStore;
-    TextView txtWelcome;
+    ListView listMenuMain;
     private String facebookID = "100006754115144";
 
     @Override
@@ -40,29 +39,18 @@ public class menu extends AppCompatActivity {
         setContentView(R.layout.activity_menu);
 
         menuBar = findViewById(R.id.menuBar);
-        btnLogin = findViewById(R.id.login);
-        btnContact = findViewById(R.id.btnContact);
-        btnGopY = findViewById(R.id.btnGopY);
-        btnStore = findViewById(R.id.btnStore);
-        txtWelcome = findViewById(R.id.welcome);
+
+        listMenuMain = findViewById(R.id.listMenuMain);
 
         final SharedPreferences sp = getSharedPreferences("userLogin", MODE_PRIVATE);
-        if(sp.getBoolean("isLogin", false)){
-            txtWelcome.setText("WELCOME " + sp.getString("username", null));
-            btnLogin.setText("Logout");
-        }
-        else{
-            txtWelcome.setText("");
-        }
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 
-
         // Menu bar
         BottomNavigationViewHelper.disableShiftMode(menuBar);
         Menu menus = menuBar.getMenu();
-        MenuItem menuItem = menus.getItem(3);
+        MenuItem menuItem = menus.getItem(4);
         menuItem.setChecked(true);
 
         SharedPreferences sharedPreferences = getSharedPreferences("shareGioHang", MODE_PRIVATE);
@@ -70,10 +58,60 @@ public class menu extends AppCompatActivity {
 
         BottomNavigationMenuView bottomNavigationMenuView =
                 (BottomNavigationMenuView) menuBar.getChildAt(0);
-        View v = bottomNavigationMenuView.getChildAt(2); // number of menu from left
+        View v = bottomNavigationMenuView.getChildAt(3); // number of menu from left
         if(soLuongMua > 0){
             new QBadgeView(this).bindTarget(v).setBadgeNumber(soLuongMua);
         }
+
+        int id_user = sp.getInt("idUser", 0);
+        User u = userDAO.readInfo(id_user);
+
+
+        List<menuMain> listMenu = new ArrayList<>();
+        SharedPreferences isLoginFacebook = getSharedPreferences("loginWithFb", MODE_PRIVATE);
+        SharedPreferences isLoginGoogle = getSharedPreferences("loginWithGoogle", MODE_PRIVATE);
+
+        if(isLoginFacebook.getBoolean("isLoginWithFB", false)){
+            Profile profile = Profile.getCurrentProfile();
+            listMenu.add(new menuMain(13,"Chào bạn, " + profile.getName()));
+        }else if(isLoginGoogle.getBoolean("isLoginWithGoogle", false)){
+            listMenu.add(new menuMain(14,"Chào bạn, " + isLoginGoogle.getString("name", null)));
+
+        }
+        else if(sp.getBoolean("isLogin", false)){
+            listMenu.add(new menuMain(8,"Chào bạn, " + sp.getString("username", null)));
+        }
+        listMenu.add(new menuMain(1,"Liên hệ với chúng tôi"));
+        listMenu.add(new menuMain(2,"Góp ý"));
+        listMenu.add(new menuMain(9, "Quét mã QR Code, Barcode"));
+        listMenu.add(new menuMain(3,"Hệ thống cửa hàng"));
+        listMenu.add(new menuMain(4,"Thẻ tích điểm"));
+        listMenu.add(new menuMain(5,"Chính sách hậu mãi"));
+        listMenu.add(new menuMain(10, "Ủng hộ chúng tôi"));
+        listMenu.add(new menuMain(15, "Đặt hàng sản phẩm mới"));
+        // If login with facebook
+        SharedPreferences loginWithFB = getSharedPreferences("loginWithFb", MODE_PRIVATE);
+        SharedPreferences loginWithGoogle = getSharedPreferences("loginWithGoogle", MODE_PRIVATE);
+        if(loginWithGoogle.getBoolean("isLoginWithGoogle", false)){
+            listMenu.add(new menuMain(12, "Đăng xuất khỏi Google"));
+        }
+        else if(loginWithFB.getBoolean("isLoginWithFB", false)){
+            // Is login with facebook
+            listMenu.add(new menuMain(11, "Đăng xuất khỏi Facebook"));
+        }
+        else{
+            if(sp.getBoolean("isLogin", false)){
+                listMenu.add(new menuMain(7,"Đăng xuất"));
+            }
+            else{
+                listMenu.add(new menuMain(6,"Đăng nhập"));
+            }
+        }
+        listMenu.add(new menuMain(16,"Layout Mới."));
+
+
+        AdapterMenuMain adapterMenuMain = new AdapterMenuMain(menu.this, listMenu);
+        listMenuMain.setAdapter(adapterMenuMain);
 
         menuBar.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -81,6 +119,10 @@ public class menu extends AppCompatActivity {
                 switch (item.getItemId()){
                     case R.id.homePage:
                         startActivity(new    Intent(menu.this, MainActivity.class));
+                        break;
+                    case R.id.app_bar_search:
+                        startActivity(new Intent(menu.this, search.class));
+                        overridePendingTransition(R.anim.slide_right, R.anim.slide_out_left);
                         break;
                     case R.id.news:
                         startActivity(new Intent(menu.this, menu_news.class));
@@ -106,7 +148,7 @@ public class menu extends AppCompatActivity {
             }
         });
 
-
+        /*
         // Login/Logout
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,5 +247,6 @@ public class menu extends AppCompatActivity {
                 startActivity(sendIntent);
             }
         });
+        */
     }
 }

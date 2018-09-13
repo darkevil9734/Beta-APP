@@ -4,19 +4,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/general"
+        android:icon="@drawable/general"
         android:layout_gravity="top"
         android:checkable="true"
         android:enabled="true"
-
         android:title="Tổng quan"
         app:showAsAction="always" />
     <item
         android:id="@+id/details"
+        android:icon="@drawable/details"
         android:title="Chi tiết"
         app:actionViewClass="android.widget.SearchView"
         app:showAsAction="always" />
     <item
         android:id="@+id/comment"
+        android:icon="@drawable/comment"
         android:enabled="true"
         android:title="Nhận xét"
         app:showAsAction="always"

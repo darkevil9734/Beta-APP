@@ -1,6 +1,9 @@
 package com.example.legia.mobileweb.AdapterSanPham;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -14,12 +17,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.legia.mobileweb.DAO.sanPhamDAO;
 import com.example.legia.mobileweb.DAO.themVaoGioHang;
 import com.example.legia.mobileweb.DTO.sanPham;
 import com.example.legia.mobileweb.DTO.sanPhamMua;
@@ -29,6 +34,7 @@ import com.example.legia.mobileweb.R;
 import com.example.legia.mobileweb.cart;
 import com.github.arturogutierrez.Badges;
 import com.github.arturogutierrez.BadgesNotSupportedException;
+import com.peekandpop.shalskar.peekandpop.PeekAndPop;
 
 import java.sql.Blob;
 import java.sql.SQLException;
@@ -66,14 +72,70 @@ public class SanPhamAdapter extends RecyclerView.Adapter<SanPhamAdapter.SanPhamV
             int blobLength = (int) b.length();
             byte[] blobAsBytes = b.getBytes(1, blobLength);
 
-            Bitmap btm = BitmapFactory.decodeByteArray(blobAsBytes,0,blobAsBytes.length);
 
+            Bitmap btm = BitmapFactory.decodeByteArray(blobAsBytes,0,blobAsBytes.length);
 
 
             DecimalFormat df = new DecimalFormat("###,###.##");
             holder.imgSanPham.setImageBitmap(btm);
             holder.name.setText(listSanPham.get(position).getTenSanPham());
             holder.price.setText(df.format(listSanPham.get(position).getGiaSanPham())+"đ");
+
+
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    LayoutInflater li = LayoutInflater.from(context);
+                    final View view3DTouch = li.inflate(R.layout.layout_infosp, null);
+
+                    ImageView imgHinhInfo = view3DTouch.findViewById(R.id.imgInfo);
+                    TextView txtTenSanPhamInfo = view3DTouch.findViewById(R.id.txtTenSanPhamInfo);
+                    TextView txtHangInfo = view3DTouch.findViewById(R.id.txtHangInfo);
+                    TextView txtGiaInfo = view3DTouch.findViewById(R.id.txtGiaInfo);
+
+                    int maSP = listSanPham.get(position).getMa_san_pham();
+                    sanPham sanPham = sanPhamDAO.docTheoID(maSP);
+
+                    Blob b = sanPham.getHinh_dai_dien();
+
+                    int blobLength = 0;
+                    try {
+                        blobLength = (int) b.length();
+                        byte[] blobAsBytes = b.getBytes(1, blobLength);
+                        Bitmap btm = BitmapFactory.decodeByteArray(blobAsBytes,0,blobAsBytes.length);
+                        imgHinhInfo.setImageBitmap(btm);
+                        DecimalFormat df = new DecimalFormat("###,###.##");
+                        txtGiaInfo.setText("Giá: " + df.format(sanPham.getGiaSanPham())+"VNĐ");
+                        txtHangInfo.setText("Hãng: " + sanPham.getHangSanXuat());
+                        txtTenSanPhamInfo.setText(sanPham.getTenSanPham());
+
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+
+                    android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(context);
+
+
+                    builder.setView(view3DTouch);
+                    builder.setPositiveButton("Quay về", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            return;
+                        }
+                    });
+
+
+
+                    android.support.v7.app.AlertDialog dialog=builder.create();
+                    dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+                    dialog.show();
+
+
+                    return true;
+                }
+            });
+
+
 
 
             /*Sự kiện click vào item*/
@@ -142,6 +204,7 @@ public class SanPhamAdapter extends RecyclerView.Adapter<SanPhamAdapter.SanPhamV
     public int getItemCount() {
         return listSanPham.size();
     }
+
 
     public class SanPhamViewHolder extends  RecyclerView.ViewHolder {
         ImageView imgSanPham;

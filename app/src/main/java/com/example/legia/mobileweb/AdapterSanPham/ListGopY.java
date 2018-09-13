@@ -62,7 +62,7 @@ public class ListGopY extends BaseAdapter {
                 int viTri = danhSachGopY.get(position).getIdGopY();
                 switch (viTri) {
                     case 1: // Facebook Mess
-                        String facebookID = "100006754115144";
+                        String facebookID = "2044607315780037";
                         try {
                             Uri uri = Uri.parse("fb-messenger://user/");
                             uri = ContentUris.withAppendedId(uri, Long.parseLong(facebookID));

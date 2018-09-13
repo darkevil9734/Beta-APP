@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.example.legia.mobileweb.DAO.userDAO;
 import com.example.legia.mobileweb.DTO.User;
 import com.example.legia.mobileweb.Encryption.encrypt;
+import com.sdsmdg.tastytoast.TastyToast;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,14 +37,16 @@ public class register extends AppCompatActivity {
             pd.dismiss();
             Intent intent = new Intent(register.this, login.class);
             startActivity(intent);
-            Toast.makeText(register.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(register.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+            TastyToast.makeText(getApplicationContext(), "Đăng ký thành công!", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+
         }
     };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-
+        this.setTitle("Đăng ký thành viên");
         //findView
         txtUsername = findViewById(R.id.username);
         txtHoTen = findViewById(R.id.name);
@@ -80,6 +83,9 @@ public class register extends AppCompatActivity {
                 else if(validateEmailAddress(email)==false){
                     txtEmail.setError("Bạn nhập không đúng định dạng Email");
                 }
+                else if(encrypt.isStrong(txtPassword.getText().toString())==false){
+                    txtPassword.setError("Mật khẩu bạn phải có chữ thường, chữ in hoa, số, và trên 8 ký tự");
+                }
                 else{
                     // thỏa
                     int dk = dangKy(hoten, username, password, email);
@@ -102,7 +108,8 @@ public class register extends AppCompatActivity {
                         t.start();
                     }
                     else{
-                        Toast.makeText(register.this, "ERROR!!", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(register.this, "ERROR!!", Toast.LENGTH_SHORT).show();
+                        TastyToast.makeText(getApplicationContext(), "Lỗi đăng ký, thử lại sau!", TastyToast.LENGTH_SHORT, TastyToast.CONFUSING);
                     }
                 }
 

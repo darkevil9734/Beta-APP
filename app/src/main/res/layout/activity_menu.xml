@@ -17,34 +17,9 @@
 
     </android.support.design.widget.BottomNavigationView>
 
-    <TextView
-        android:id="@+id/welcome"
+    <ListView
+        android:id="@+id/listMenuMain"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="" />
-
-    <Button
-        android:id="@+id/btnContact"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Liên hệ chúng tôi" />
-
-    <Button
-        android:id="@+id/btnGopY"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Góp ý" />
-
-    <Button
-        android:id="@+id/btnStore"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Hệ thống cửa hàng" />
-
-    <Button
-        android:id="@+id/login"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Login" />
+        android:layout_height="match_parent" />
 
 </LinearLayout>

@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import com.google.android.gms.location.LocationListener;
+//import com.google.android.gms.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -47,7 +47,7 @@ public class hethong extends AppCompatActivity {
         txtCount = findViewById(R.id.txtCount);
         listCuaHang = findViewById(R.id.listHeThong);
 
-        String quan = getCurrentLocate();
+        //String quan = getCurrentLocate();
 
         List<String> danhSachQuan = new ArrayList<>();
         danhSachQuan.add("Quận 1");
@@ -291,7 +291,7 @@ public class hethong extends AppCompatActivity {
 
 
 
-    private String getCurrentLocate(){
+    /*private String getCurrentLocate(){
         String quan = "";
         try {
             final double[] longitude = {0};
@@ -317,4 +317,5 @@ public class hethong extends AppCompatActivity {
         }
         return quan;
     }
+*/
 }

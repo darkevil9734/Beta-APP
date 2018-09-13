@@ -1,5 +1,9 @@
 package com.example.legia.mobileweb.DAO;
 
+import android.annotation.TargetApi;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+
 import com.example.legia.mobileweb.DTO.sanPham;
 import com.example.legia.mobileweb.Database.Database;
 
@@ -11,13 +15,14 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class sanPhamDAO {
+
+public class sanPhamDAO{
     public static List<sanPham> DocTatCa(){
         List<sanPham> dsSanPham = null;
         try {
             Connection db = Database.connect();
             Statement stm = db.createStatement();
-            ResultSet rs = stm.executeQuery("SELECT * FROM san_pham");
+            ResultSet rs = stm.executeQuery("SELECT * FROM san_pham ORDER by rand()");
             dsSanPham = new ArrayList<>();
 
             while(rs.next()){
@@ -46,6 +51,7 @@ public class sanPhamDAO {
         return dsSanPham;
 
     }
+
 
     public static List<sanPham> danhSachSoSanh(int maSanPhamChinh){
         List<sanPham> dsSanPhamSoSanh = null;
@@ -354,7 +360,8 @@ public class sanPhamDAO {
         try {
             Connection db = Database.connect();
             Statement stm = db.createStatement();
-            ResultSet rs = stm.executeQuery("select * from san_pham where hang_san_xuat like '%"+hang_sxuat+"%'");
+
+            ResultSet rs = stm.executeQuery("select * from san_pham where hang_san_xuat like '%"+hang_sxuat+"%' order by ma_san_pham desc " );
             dsSanPham = new ArrayList<>();
             while(rs.next()){
                 sanPham sp = new sanPham();
@@ -817,4 +824,6 @@ public class sanPhamDAO {
 
         return listTren10Trieu;
     }
+
+
 }

@@ -41,6 +41,7 @@ import com.example.legia.mobileweb.DTO.sanPham;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.LikeView;
 import com.facebook.share.widget.ShareDialog;
 import com.github.juanlabrador.badgecounter.BadgeCounter;
 
@@ -58,14 +59,15 @@ public class Detail extends AppCompatActivity {
     Button btnThemVaoGio, btnSoSanh;
     TextView txtTenSanPhamChiTiet, txtHangSanXuatChiTiet, txtGiaSanPhamChiTiet, txtCameraTruocChiTiet, txtCameraSauChiTiet, txtTinhTrangChiTiet;
     int maSanPham;
+    LikeView likeButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        //FacebookSdk.setApplicationId("254499031809848");
-        //FacebookSdk.sdkInitialize(Detail.this);
+        FacebookSdk.setApplicationId("254499031809848");
+        FacebookSdk.sdkInitialize(Detail.this);
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
@@ -82,6 +84,7 @@ public class Detail extends AppCompatActivity {
         txtCameraTruocChiTiet = findViewById(R.id.txtCameraTruocChiTietSanPham);
         txtGiaSanPhamChiTiet = findViewById(R.id.txtGiaTienChiTiet);
         txtTinhTrangChiTiet = findViewById(R.id.txtTinhTrangChiTietSanPham);
+        //likeButton = findViewById(R.id.)
 
         BottomNavigationViewHelper.disableShiftMode(menuChiTiet);
         menuChiTiet.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -99,6 +102,8 @@ public class Detail extends AppCompatActivity {
                         Intent intent2 = new Intent(Detail.this, comment.class);
                         intent2.putExtra("url", url);
                         startActivity(intent2);
+                        overridePendingTransition(R.anim.slide_right, R.anim.slide_out_left);
+
 
                         break;
                 }
@@ -453,6 +458,9 @@ public class Detail extends AppCompatActivity {
                         .build();
                 ShareDialog.show(this,shareLinkContent);
                 break;
+            case android.R.id.home:
+                this.finish();
+                return true;
         }
         return true;
     }

@@ -1,6 +1,7 @@
 package com.example.legia.mobileweb;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,6 +12,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Parcelable;
@@ -20,6 +22,7 @@ import android.support.annotation.RequiresApi;
 import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
+import android.support.multidex.MultiDex;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -37,6 +40,7 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -51,19 +55,26 @@ import com.example.legia.mobileweb.DAO.sanPhamDAO;
 import com.example.legia.mobileweb.DAO.themVaoGioHang;
 import com.example.legia.mobileweb.DTO.sanPham;
 import com.example.legia.mobileweb.Database.Database;
+import com.example.legia.mobileweb.Database.Firebase.DAO.countOrder;
+import com.example.legia.mobileweb.Database.Firebase.FirebaseConnect;
+import com.facebook.share.Share;
 import com.github.arturogutierrez.Badges;
 import com.github.arturogutierrez.BadgesNotSupportedException;
+import com.sdsmdg.tastytoast.TastyToast;
 
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import q.rorbin.badgeview.QBadgeView;
+import shortbread.Shortbread;
+import shortbread.Shortcut;
 
 import static android.support.constraint.Constraints.TAG;
 
@@ -88,12 +99,48 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences.Editor editorCount;
     private int count = 0;
 
+    @Shortcut(id = "cart", icon = R.drawable.carticonbread, shortLabel = "Giỏ hàng")
+    public void openCart(){
+        themVaoGioHang gioHang = SanPhamAdapter.gioHang;
+        int count = gioHang.countSoLuongMua();
+        if(count>0){
+            startActivity(new Intent(this, cart.class));
+        }
+        else{
+            TastyToast.makeText(this, "Chưa có sản phẩm trong giỏ hàng", TastyToast.LENGTH_SHORT, TastyToast.WARNING).show();
+        }
+    }
+
+    @Shortcut(id = "login", icon = R.drawable.loginbread, shortLabel = "Đăng nhập")
+    public void openLogin(){
+        SharedPreferences loginFacebook = getSharedPreferences("loginWithFb", MODE_PRIVATE);
+        SharedPreferences loginGoogle = getSharedPreferences("loginWithGoogle", MODE_PRIVATE);
+        SharedPreferences loginNormal = getSharedPreferences("userLogin", MODE_PRIVATE);
+        if(loginFacebook.getBoolean("isLoginWithFB", false)){
+            TastyToast.makeText(this, "Bạn đã đăng nhập trước đó", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
+        }
+        else if(loginGoogle.getBoolean("isLoginWithGoogle",false)){
+            TastyToast.makeText(this, "Bạn đã đăng nhập trước đó", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
+        }
+        else if(loginNormal.getBoolean("isLogin",false)){
+            TastyToast.makeText(this, "Bạn đã đăng nhập trước đó", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
+        }
+        else{
+            startActivity(new Intent(this, login.class));
+        }
+    }
+
+    @Shortcut(id = "scan", icon = R.drawable.scancode, shortLabel = "Quét mã QR/Barcode")
+    public void openScan(){
+        startActivity(new Intent(this, scancode.class));
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        MultiDex.install(this);
+        Shortbread.create(this);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -141,6 +188,14 @@ public class MainActivity extends AppCompatActivity {
         btn3Den7Trieu = findViewById(R.id.btbChiTiet3Den7Trieu);
         btnCaoCap = findViewById(R.id.btbChiTietCaoCap);
 
+        /*View viewEvent = getLayoutInflater().inflate( R.layout.layout_event, null);
+
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder( this );
+        dialog.setView(viewEvent);
+
+        dialog.show();*/
+
 
         // menu bar
         menuBar = findViewById(R.id.menuBar);
@@ -151,19 +206,32 @@ public class MainActivity extends AppCompatActivity {
 
         // Cách 2: lấy từ SharedPrefence lên:
         SharedPreferences sharedPreferences = getSharedPreferences("shareGioHang", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
         final int soLuongMua = sharedPreferences.getInt("soLuongMua", 0);
+
 
         themVaoGioHang gioHang = SanPhamAdapter.gioHang;
 
+        if(soLuongMua>0){
+            editor.clear();
+            editor.commit();
+        }
         try {
-            Badges.setBadge(this, gioHang.countSoLuongMua());
+            Intent i = getIntent();
+            int count = i.getIntExtra("countGioHang", 0);
+            if(count>0){
+                Badges.setBadge(this, count);
+            }
+            else{
+                Badges.setBadge(this, gioHang.countSoLuongMua());
+            }
         } catch (BadgesNotSupportedException badgesNotSupportedException) {
             Log.d(TAG, badgesNotSupportedException.getMessage());
         }
         BottomNavigationViewHelper.disableShiftMode(menuBar);
         BottomNavigationMenuView bottomNavigationMenuView =
                 (BottomNavigationMenuView) menuBar.getChildAt(0);
-        View v = bottomNavigationMenuView.getChildAt(2); // number of menu from left
+        View v = bottomNavigationMenuView.getChildAt(3); // number of menu from left
         if(soLuongMua > 0){
             new QBadgeView(this).bindTarget(v).setBadgeNumber(soLuongMua);
         }
@@ -174,16 +242,20 @@ public class MainActivity extends AppCompatActivity {
                 switch (item.getItemId()){
                     case R.id.homePage:
                         break;
-
+                    case R.id.app_bar_search:
+                        startActivity(new Intent(MainActivity.this, search.class));
+                        overridePendingTransition(R.anim.slide_right, R.anim.slide_out_left);
+                        break;
                     case R.id.news:
                         Intent news = new Intent(MainActivity.this, menu_news.class);
                         startActivity(news);
+                        overridePendingTransition(R.anim.slide_right, R.anim.slide_out_left);
                         break;
-
                     case R.id.cart:
                         if (soLuongMua > 0){
                             Intent cart = new Intent(MainActivity.this, cart.class);
                             startActivity(cart);
+                            overridePendingTransition(R.anim.slide_right, R.anim.slide_out_left);
                         }
                         else{
                             AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(MainActivity.this);
@@ -205,7 +277,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         if(CheckInternet.checkConnection(this)){
-
             final SlidingAdapter adapter = new SlidingAdapter(this, hinh);
                 myPager.setAdapter(adapter);
 

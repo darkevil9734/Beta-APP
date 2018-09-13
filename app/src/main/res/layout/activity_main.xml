@@ -54,7 +54,8 @@
                     android:layout_weight="1"
                     android:paddingBottom="5dp"
                     android:text="Apple"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
                 <Button
                     android:id="@+id/btnChiTietApple"

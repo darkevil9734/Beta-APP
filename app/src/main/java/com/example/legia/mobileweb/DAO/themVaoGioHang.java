@@ -63,6 +63,10 @@ public class themVaoGioHang {
         return tt;
     }
 
+    public void clearGioHang(){
+        danhSachHang.clear();
+    }
+
     public int countSoLuongMua() {
         return danhSachHang.size();
     }

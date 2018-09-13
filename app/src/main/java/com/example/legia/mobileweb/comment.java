@@ -36,7 +36,7 @@ public class comment extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
 
-        this.setTitle("Comment");
+        this.setTitle("Bình luận");
         webComment = findViewById(R.id.commentsView);
 
         mContainer =  findViewById(R.id.webview_frame);

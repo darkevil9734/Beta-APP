@@ -1,6 +1,8 @@
 package com.example.legia.mobileweb.DTO;
 
-public class hoaDon {
+import java.io.Serializable;
+
+public class hoaDon implements Serializable {
     private static final long serialVersionUID = 1L;
     private int id_giohang;
     private int id_user;
@@ -14,6 +16,8 @@ public class hoaDon {
     private String quan;
     private String phuong;
     private String chiTiet;
+    private String hinhThucThanhToan;
+
 
 
     public int getId_giohang() {
@@ -82,6 +86,15 @@ public class hoaDon {
     public void setChiTiet(String chiTiet) {
         this.chiTiet = chiTiet;
     }
+
+    public String getHinhThucThanhToan() {
+        return hinhThucThanhToan;
+    }
+
+    public void setHinhThucThanhToan(String hinhThucThanhToan) {
+        this.hinhThucThanhToan = hinhThucThanhToan;
+    }
+
     public hoaDon() {
         super();
     }

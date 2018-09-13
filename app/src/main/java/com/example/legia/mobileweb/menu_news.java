@@ -30,7 +30,7 @@ public class menu_news extends AppCompatActivity {
         listProvider.add(new newsProvider(R.drawable.vietcombank, "Xem tỉ giá", "https://www.vietcombank.com.vn/ExchangeRates/ExrateXML.aspx"));
         listProvider.add(new newsProvider(R.drawable.vnexpress, "VnExpress", "https://vnexpress.net/rss/so-hoa.rss"));
         listProvider.add(new newsProvider(R.drawable.thanhnien, "ThanhNien", "https://thanhnien.vn/rss/cong-nghe-thong-tin.rss"));
-        listProvider.add(new newsProvider(R.drawable.vietnamnet, "VietNamNet", "http://vietnamnet.vn/rss/cong-nghe.rss"));
+        listProvider.add(new newsProvider(R.drawable.apple, "Sự kiện ra mắt", "http://podcasts.apple.com/apple_keynotes/apple_keynotes.xml"));
         listProvider.add(new newsProvider(R.drawable.ict, "ICT News", "http://ictnews.vn/rss/the-gioi-so/di-dong"));
         listProvider.add(new newsProvider(R.drawable.tinhte, "Tinh Tế", "https://tinhte.vn/rss"));
 
@@ -52,15 +52,19 @@ public class menu_news extends AppCompatActivity {
                     Toast.makeText(menu_news.this, "Vietcombank", Toast.LENGTH_SHORT).show();
                 }
                 else {
+
                     Intent i = new Intent(menu_news.this, News.class);
                     Bundle b = new Bundle();
 
                     b.putString("urlProvider", listProvider.get(position).getUrlProvider());
-
+                    if(position==3){
+                       b.putString("apple", "apple");
+                    }
                     i.putExtra("news", b);
 
                     startActivity(i);
                 }
+
             }
         });
 

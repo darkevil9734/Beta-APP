@@ -53,6 +53,7 @@ public class GridViewAdapterSanPham extends BaseAdapter {
         {
             convertView= LayoutInflater.from(context).inflate(R.layout.layout_san_pham,parent,false);
         }
+
         final sanPham SanPham = (sanPham) this.getItem(position);
 
         ImageView img = (ImageView) convertView.findViewById(R.id.imgSanPham);

@@ -17,6 +17,9 @@ public class User implements Serializable {
         private String zip_code;
         private String quan;
         private String phuong;
+        private int id_the_tich_diem;
+        private String loai_the;
+        private int diem;
 
         public User() {
             super();
@@ -137,4 +140,27 @@ public class User implements Serializable {
             this.zip_code = zip_code;
         }
 
+    public int getId_the_tich_diem() {
+        return id_the_tich_diem;
+    }
+
+    public void setId_the_tich_diem(int id_the_tich_diem) {
+        this.id_the_tich_diem = id_the_tich_diem;
+    }
+
+    public String getLoai_the() {
+        return loai_the;
+    }
+
+    public void setLoai_the(String loai_the) {
+        this.loai_the = loai_the;
+    }
+
+    public int getDiem() {
+        return diem;
+    }
+
+    public void setDiem(int diem) {
+        this.diem = diem;
+    }
 }

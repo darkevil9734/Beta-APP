@@ -26,6 +26,7 @@ public class sanPhamMuaDAO {
             pst.setString(9, hd.getChiTiet());
 
             status = pst.executeUpdate();
+            db.close();
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -45,6 +46,7 @@ public class sanPhamMuaDAO {
             pst.setInt(3, spm.getMa_san_pham());
 
             status = pst.executeUpdate();
+            db.close();
         }
         catch (SQLException e) {
             // TODO Auto-generated catch block

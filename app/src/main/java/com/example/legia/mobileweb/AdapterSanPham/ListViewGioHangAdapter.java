@@ -75,6 +75,7 @@ public class ListViewGioHangAdapter extends BaseAdapter {
             name.setText(sanPhamMua.getTenSanPham());
             count.setText("Số lượng mua : " + sanPhamMua.getSoLuongMua());
             price.setText("Giá 1 cái : " + df.format(sanPhamMua.getGiaSanPham()) + " VNĐ");
+
             Blob b = sanPhamMua.getHinh_dai_dien();
 
             int blobLength = (int) b.length();
@@ -109,6 +110,7 @@ public class ListViewGioHangAdapter extends BaseAdapter {
                     final TextView txtTenSanPham = detail.findViewById(R.id.txtDetailProduct);
                     final TextView txtHangSanPham = detail.findViewById(R.id.txtBrandProduct);
                     final TextView txtSoLuongMua = detail.findViewById(R.id.txtSoLuongMuaChiTiet);
+                    final TextView txtTotalPrice = detail.findViewById(R.id.txtTongTienUpdate);
                     final ImageView imgHinhChiTiet = detail.findViewById(R.id.imgChiTietGioHang);
                     final Button btnTang = detail.findViewById(R.id.btnTang);
                     final Button btnGiam = detail.findViewById(R.id.btnGiam);
@@ -124,19 +126,23 @@ public class ListViewGioHangAdapter extends BaseAdapter {
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-
+                    final DecimalFormat df = new DecimalFormat("###,###.##");
+                    themVaoGioHang gioHang = SanPhamAdapter.gioHang;
 
                     txtTenSanPham.setText(sanPhamMua.getTenSanPham());
                     txtHangSanPham.setText(sanPhamMua.getHangSanXuat());
                     txtSoLuongMua.setText(sanPhamMua.getSoLuongMua()+"");
-
+                    txtTotalPrice.setText(df.format(sanPhamMua.getThanhTien())+"đ");
 
                     btnTang.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             int slm = Integer.parseInt(txtSoLuongMua.getText().toString());
                             slm+=1;
+                            double gia1Cai = sanPhamMua.getGiaSanPham();
+                            double giaTotal = gia1Cai*slm;
                             txtSoLuongMua.setText(slm+"");
+                            txtTotalPrice.setText(df.format(giaTotal)+"đ");
 
                         }
                     });
@@ -150,7 +156,10 @@ public class ListViewGioHangAdapter extends BaseAdapter {
                                 Toast.makeText(context, "Số lượng mua phải lớn hơn 0", Toast.LENGTH_SHORT).show();
                                 return;
                             }
+                            double gia1Cai = sanPhamMua.getGiaSanPham();
+                            double giaTotal = gia1Cai*slm;
                             txtSoLuongMua.setText(slm+"");
+                            txtTotalPrice.setText(df.format(giaTotal)+"đ");
                         }
                     });
 

@@ -22,7 +22,7 @@
     <ImageView
         android:id="@+id/imgHinhSanPham"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
         app:srcCompat="@mipmap/ic_launcher" />
 
     <TextView
@@ -33,6 +33,7 @@
         android:textAlignment="center"
         android:textSize="22sp"
         android:textStyle="bold" />
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -47,18 +48,34 @@
             android:layout_weight="1"
             android:background="@color/btn_mua"
 
-            android:text="Mua" />
+            android:text="Mua"
+            android:textColor="@color/white" />
 
         <Button
             android:id="@+id/btnSoSanh"
             android:layout_width="10dp"
             android:layout_height="50dp"
-            android:layout_marginLeft="90dp"
+            android:layout_marginLeft="15dp"
             android:layout_marginRight="50dp"
             android:layout_weight="1"
             android:background="@color/btn_so_sanh"
-            android:text="So sánh" />
+            android:text="So sánh"
+            android:textColor="@color/white" />
     </LinearLayout>
+    <com.like.LikeButton
+        app:icon_type="Star"
+        app:circle_start_color="@color/colorPrimary"
+        app:like_drawable="@drawable/thumb_on"
+        app:unlike_drawable="@drawable/thumb_off"
+        app:dots_primary_color="@color/colorAccent"
+        app:dots_secondary_color="@color/colorPrimary"
+        app:circle_end_color="@color/colorAccent"
+        app:icon_size="25dp"
+        app:liked="true"
+        app:anim_scale_factor="2"
+        app:is_enabled="false"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <TableLayout
         android:layout_width="match_parent"
@@ -67,7 +84,7 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="5dp">
 
             <TextView
                 android:layout_width="200dp"
@@ -88,7 +105,7 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="5dp"
             android:background="@color/input_login_hint">
 
             <TextView
@@ -110,7 +127,7 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="5dp">
 
             <TextView
 
@@ -132,7 +149,7 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="5dp"
             android:background="@color/input_login_hint">
 
             <TextView
@@ -155,7 +172,7 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="5dp">
 
             <TextView
 

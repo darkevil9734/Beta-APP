@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -22,12 +23,16 @@ import com.example.legia.mobileweb.AdapterHeThong.AdapterOptionPayment;
 import com.example.legia.mobileweb.AdapterSanPham.ListViewGioHangAdapter;
 import com.example.legia.mobileweb.AdapterSanPham.SanPhamAdapter;
 import com.example.legia.mobileweb.DAO.hoaDonDAO;
+import com.example.legia.mobileweb.DAO.theTichDiemDAO;
 import com.example.legia.mobileweb.DAO.themVaoGioHang;
 import com.example.legia.mobileweb.DAO.userDAO;
 import com.example.legia.mobileweb.DTO.User;
 import com.example.legia.mobileweb.DTO.hoaDon;
 import com.example.legia.mobileweb.DTO.payment;
 import com.example.legia.mobileweb.DTO.sanPhamMua;
+import com.example.legia.mobileweb.DTO.theKhachHang;
+import com.example.legia.mobileweb.Database.Database;
+import com.example.legia.mobileweb.Encryption.encrypt;
 import com.example.legia.mobileweb.TyGia.DocTyGia;
 import com.paypal.android.sdk.payments.PayPalConfiguration;
 import com.paypal.android.sdk.payments.PayPalPayment;
@@ -36,8 +41,12 @@ import com.paypal.android.sdk.payments.PaymentActivity;
 import com.paypal.android.sdk.payments.PaymentConfirmation;
 
 import org.json.JSONException;
-
+import javax.activation.*;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +74,7 @@ public class cart extends AppCompatActivity {
     Intent m_service;
     private static final String CONFIG_ENVIRONMENT = PayPalConfiguration.ENVIRONMENT_SANDBOX;
 
-    String diaChi, quan, phuong = "";
+    String diaChi, quan, phuong, soDienThoaiMaHoa = "";
     int soDienThoai = 0;
 
     @Override
@@ -78,12 +87,14 @@ public class cart extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         final  SharedPreferences sp = getSharedPreferences("userLogin", MODE_PRIVATE);
 
+        DecimalFormat df = new DecimalFormat("###,###.##");
 
         Toast.makeText(this, "Giá usd : " + DocTyGia.giaBan(), Toast.LENGTH_SHORT).show();
         dsGioHang = findViewById(R.id.listCart);
         //btnPay = findViewById(R.id.btnPay);
         totalMoney = findViewById(R.id.lbTotal);
         btnOption = findViewById(R.id.btnOption);
+        btnOption.setText(Html.fromHtml("<html>Thanh Toán \t&#x2794;</html>"));
 
         gioHang = SanPhamAdapter.gioHang;
         this.setTitle("Giỏ hàng ( " + gioHang.countSoLuongMua() + " sản phẩm )" );
@@ -93,8 +104,44 @@ public class cart extends AppCompatActivity {
         m_service.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, configure);
         startService(m_service);
 
-        DecimalFormat df = new DecimalFormat("###,###.##");
-        totalMoney.setText("Tổng tiền : "+ df.format(gioHang.tongTien())+" VNĐ");
+        final  SharedPreferences sharedPreferences = getSharedPreferences("userLogin", MODE_PRIVATE);
+
+        int iduser = sharedPreferences.getInt("idUser", 0);
+        int loaiThe =0;
+        double tongTien = gioHang.tongTien();
+        double tongTienGiamGia = 0;
+        loaiThe = userDAO.layLoaiTheUser(iduser);
+        switch (loaiThe){
+            case 1: // Copper, normal
+                Log.i("test", "thẻ đồng");
+                tongTien = tongTien;
+                break;
+            case 2: // Silver, discount 2%
+                Log.i("test", "thẻ bạc");
+                tongTienGiamGia = tongTien - tongTien*0.02;
+                break;
+            case 3: // Gold, discount 5%
+                Log.i("test", "thẻ vàng");
+                tongTienGiamGia = tongTien - tongTien*0.05;
+                /*totalMoney.setText(Html.fromHtml(
+                        "<html>Tổng tiền: " + df.format(tongTien) +"</strike><br/>"+
+                                "Tiền giảm giá: "+ df.format(tongTienGiamGia) +
+                                "</html>"
+                ));*/
+                break;
+            case 4: // Plantium, discount 7%
+                Log.i("test", "thẻ bạch kim");
+                tongTienGiamGia = tongTien - tongTien*0.07;
+                break;
+            case 5: // Diamond, discount 10%
+                Log.i("test", "thẻ kim cương");
+                tongTienGiamGia = tongTien - tongTien*0.1;
+                break;
+
+        }
+
+        //
+        totalMoney.setText("Tổng tiền : "+ df.format(tongTien)+" VNĐ");
 
         Log.i("test", DocTyGia.giaBan()+"");
 
@@ -105,7 +152,7 @@ public class cart extends AppCompatActivity {
                 List<payment> dsPayment = new ArrayList<>();
                 dsPayment.add(new payment(1, R.drawable.paypallogo));
                 dsPayment.add(new payment(2, R.drawable.onepaylogo));
-                //dsPayment.add(new payment(3, R.drawable.vnpay));
+                dsPayment.add(new payment(6, R.drawable.momo));
                 dsPayment.add(new payment(4, R.drawable.cod));
                 dsPayment.add(new payment(5, R.drawable.vtc));
 
@@ -264,7 +311,11 @@ public class cart extends AppCompatActivity {
         switch (item.getItemId()){
             case android.R.id.home:
                 this.finish();
-                startActivity(new Intent(this, MainActivity.class));
+                int countGioHang = gioHang.countSoLuongMua();
+                Intent i = new Intent(this, MainActivity.class);
+                i.putExtra("countGioHang", countGioHang);
+                startActivity(i);
+                overridePendingTransition(R.anim.slide_left, R.anim.slide_out_right);
                 return true;
         }
         return false;
@@ -274,7 +325,7 @@ public class cart extends AppCompatActivity {
     private double ConvertToUSD(double vnd){
         return vnd/ DocTyGia.giaBan();
     }
-
+    String diaChiGiaiMa, phuongGiaiMa, quanGiaiMa, soDienThoaiGiaiMa = "";
     // After pay with PayPal, get result
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -296,13 +347,104 @@ public class cart extends AppCompatActivity {
                     }
 
                     User u = userDAO.readUser(iduser);
+                    int id_the_tich_diem = u.getId_the_tich_diem();
 
+                    double tongTien = gioHang.tongTien();
+
+                    theKhachHang theKhachHang = theTichDiemDAO.theKhachHang(id_the_tich_diem);
+                    int diem = theKhachHang.getDiem();
+
+                    diem+= tongTien/100000;
+                    if(diem>=100 && diem <400){
+                        // Silver
+                        int updateThe = theTichDiemDAO.nangCapThe(id_the_tich_diem, 2);
+                    }
+                    else if(diem >=400 && diem<700){
+                        // Gold
+                        int updateThe = theTichDiemDAO.nangCapThe(id_the_tich_diem, 3);
+
+                    }
+                    else if(diem>=700 && diem <1000){
+                        // Plantium
+                        int updateThe = theTichDiemDAO.nangCapThe(id_the_tich_diem, 4);
+
+                    }else if(diem>=1000){
+                        // Diamond
+                        int updateThe = theTichDiemDAO.nangCapThe(id_the_tich_diem, 5);
+
+                    }
+
+                    int tichDiem = theTichDiemDAO.tichDiem(id_the_tich_diem, diem);
+
+                    String soDienThoaiMaHoa = "";
                     SharedPreferences sharedPreferencesInfo = getSharedPreferences("info_khach_hang", MODE_PRIVATE);
                     diaChi = sharedPreferencesInfo.getString("diaChi", "");
                     phuong = sharedPreferencesInfo.getString("phuong", "");
                     quan = sharedPreferencesInfo.getString("quan", "");
-                    soDienThoai = sharedPreferencesInfo.getInt("sdt", 0);
+                    soDienThoaiMaHoa = sharedPreferencesInfo.getString("sdt", "");
 
+
+
+                    if (diaChi != null) {
+                        String[] split = diaChi.substring(1, diaChi.length()-1).split(", ");
+                        byte[] array = new byte[split.length];
+                        for (int i = 0; i < split.length; i++) {
+                            array[i] = Byte.parseByte(split[i]);
+                        }
+                        diaChi = array.toString();
+                        try {
+                            diaChiGiaiMa = encrypt.decrypt(array);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    if (phuong != null) {
+                        String[] split = phuong.substring(1, phuong.length()-1).split(", ");
+                        byte[] array = new byte[split.length];
+                        for (int i = 0; i < split.length; i++) {
+                            array[i] = Byte.parseByte(split[i]);
+                        }
+                        phuong = array.toString();
+                        try {
+                            phuongGiaiMa = encrypt.decrypt(array);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    if (quan != null) {
+                        String[] split = quan.substring(1, quan.length()-1).split(", ");
+                        byte[] array = new byte[split.length];
+                        for (int i = 0; i < split.length; i++) {
+                            array[i] = Byte.parseByte(split[i]);
+                        }
+                        quan = array.toString();
+                        try {
+                            quanGiaiMa = encrypt.decrypt(array);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    if (soDienThoaiMaHoa != null) {
+                        String[] split = soDienThoaiMaHoa.substring(1, soDienThoaiMaHoa.length()-1).split(", ");
+                        byte[] array = new byte[split.length];
+                        for (int i = 0; i < split.length; i++) {
+                            array[i] = Byte.parseByte(split[i]);
+                        }
+                        try {
+                            soDienThoaiGiaiMa = encrypt.decrypt(array);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    soDienThoai = Integer.parseInt(soDienThoaiGiaiMa);
+
+
+
+                    // Save to db
                     hoaDon hd = new hoaDon();
                     hd.setId_user(iduser);
                     hd.setTen_user(u.getTen_user());
@@ -314,6 +456,7 @@ public class cart extends AppCompatActivity {
                     hd.setPhuong(phuong);
                     hd.setQuan(quan);
                     hd.setChiTiet(details);
+                    hd.setHinhThucThanhToan("Thanh toán PayPal");
                     int themHoaDon = hoaDonDAO.themHoaDon(hd);
                     if(themHoaDon != 0){
                         // Clear all of memories
@@ -351,7 +494,10 @@ public class cart extends AppCompatActivity {
                                     + "<br/> Sau đây là chi tiết đơn hàng bạn đã mua: "
                                     + "<br/> <br/>" + " <strong> " + sp_mua + "</strong>"
                                     + "<br/> <br/>" + " <strong> Tổng tiền: " + df.format(gioHang.tongTien()) + " VNĐ</strong>"
-                                    + "<br/> <br/> Ban Quản Lý, VHN!";
+                                    + "<br/> <br/>" + "<strong> Địa chỉ giao hàng: " + diaChiGiaiMa + "Phường: " + phuongGiaiMa
+                                    + "Quận: " + quanGiaiMa
+                                    + "<br/> <br/> Số điện thoại liên hệ: " + soDienThoai
+                                    + "<br/> <br/> Ban Quản Lý, VHN! </strong>";
                             //message.setText(noiDung);
                             message.setContent(noiDung, "text/html; charset=utf-8");
                             Transport.send(message);
